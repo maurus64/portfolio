@@ -135,6 +135,7 @@ select option{background:var(--bg2)}
   </div>
   <div class="header-right">
     <button class="btn btn-sm" onclick="exportCSV()">CSV</button>
+    <button class="btn btn-sm btn-r" onclick="resetAll()">초기화</button>
     <button class="btn btn-sm btn-p" onclick="saveAll()">저장</button>
   </div>
 </div>
@@ -158,7 +159,7 @@ select option{background:var(--bg2)}
       <th>종목</th><th style="text-align:right">수량</th>
       <th style="text-align:right">평균매수가</th><th style="text-align:right">현재가</th>
       <th style="text-align:right">평가손익</th><th style="text-align:right">수익률</th>
-      <th style="text-align:center">신호</th>
+      <th style="text-align:center">신호</th><th style="text-align:center">수정</th>
     </tr></thead><tbody id="main-tb"></tbody></table>
   </div>
   <div class="chart-wrap"><canvas id="plChart"></canvas></div>
@@ -346,6 +347,20 @@ function sv(){
 }
 function saveAll(){sv();renderAll();}
 
+function resetAll(){
+  if(!confirm('⚠️ 전체 초기화\n\n모든 데이터(종목, 지표, 매도 이력)가 삭제됩니다.\n정말 초기화하시겠습니까?'))return;
+  if(!confirm('마지막 확인입니다.\n초기화하면 되돌릴 수 없습니다. 계속하시겠습니까?'))return;
+  ['pf_s','pf_t','pf_l','pf_h','pf_ah','pf_ts'].forEach(k=>localStorage.removeItem(k));
+  S={stocks:[],tech:[],logs:[],hist:[],ah:[],ts:''};
+  document.getElementById('ts-label').textContent='초기화 완료 — 종목을 새로 입력해주세요';
+  renderAll();
+  alert('초기화 완료!\n[매수 관리] 탭에서 종목을 새로 추가해주세요.');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-buy').classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>{if(t.textContent.trim()==='매수 관리')t.classList.add('active');});
+}
+
 const W=n=>n.toLocaleString('ko-KR');
 const P=n=>(n>=0?'+':'')+n.toFixed(1)+'%';
 const catCls={stock:'row-s',gold:'row-g',coin:'row-c'};
@@ -403,19 +418,83 @@ function renderDash(){
     <div class="metric"><div class="metric-label">총 수익률</div><div class="metric-value ${pct>=0?'green':'red'}">${P(pct)}</div></div>
     <div class="metric"><div class="metric-label">보유 종목</div><div class="metric-value">${S.stocks.length}개</div></div>`;
   const tb=document.getElementById('main-tb');tb.innerHTML='';
-  S.stocks.forEach(s=>{
+  S.stocks.forEach((s,i)=>{
     const pl=s.qty*s.cur-s.qty*s.buy,pct=s.buy?(s.cur-s.buy)/s.buy*100:0,sg=sig(s);
-    const tr=document.createElement('tr');tr.className=catCls[s.cat]||'';
+    // 일반 표시 행
+    const tr=document.createElement('tr');tr.className=catCls[s.cat]||'';tr.id='row-'+i;
     tr.innerHTML=`<td><strong>${s.name}</strong><br><span style="font-size:11px;color:var(--muted)">${catLbl[s.cat]}</span></td>
-      <td style="text-align:right;font-family:var(--mono)">${s.qty}</td>
-      <td style="text-align:right;font-family:var(--mono)">₩${W(Math.round(s.buy))}</td>
+      <td style="text-align:right;font-family:var(--mono)" id="td-qty-${i}">${s.qty}</td>
+      <td style="text-align:right;font-family:var(--mono)" id="td-buy-${i}">₩${W(Math.round(s.buy))}</td>
       <td style="text-align:right;font-family:var(--mono)">₩${W(Math.round(s.cur))}</td>
       <td style="text-align:right;font-family:var(--mono)" class="${pl>=0?'green':'red'}">${pl>=0?'+':''}₩${W(Math.round(pl))}</td>
       <td style="text-align:right;font-family:var(--mono)" class="${pct>=0?'green':'red'}">${P(pct)}</td>
-      <td style="text-align:center"><span class="badge ${sg.cls}">${sg.label}</span></td>`;
+      <td style="text-align:center"><span class="badge ${sg.cls}">${sg.label}</span></td>
+      <td style="text-align:center"><button class="btn btn-sm" style="color:var(--accent);border-color:var(--accent);font-size:11px" onclick="showEditRow(${i})">수정</button></td>`;
     tb.appendChild(tr);
+    // 편집 행 (기본 숨김)
+    const er=document.createElement('tr');er.id='edit-row-'+i;er.style.display='none';
+    er.style.background='var(--bg3)';
+    er.innerHTML=`<td colspan="8" style="padding:12px 16px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:13px;font-weight:600;color:var(--accent);min-width:80px">${s.name}</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <label style="font-size:11px;color:var(--muted);white-space:nowrap">수량</label>
+          <input type="number" id="edit-qty-${i}" value="${s.qty}" style="width:100px;padding:5px 8px;font-size:12px;font-family:var(--mono)" step="0.00000001">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <label style="font-size:11px;color:var(--muted);white-space:nowrap">평균매수가 (원)</label>
+          <input type="number" id="edit-buy-${i}" value="${Math.round(s.buy)}" style="width:140px;padding:5px 8px;font-size:12px;font-family:var(--mono)">
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-p" onclick="applyEditRow(${i})">적용</button>
+          <button class="btn btn-sm" onclick="hideEditRow(${i})">취소</button>
+        </div>
+      </div>
+    </td>`;
+    tb.appendChild(er);
   });
   renderChart();
+}
+
+function showEditRow(i){
+  // 다른 편집 행 모두 닫기
+  S.stocks.forEach((_,j)=>{
+    const er=document.getElementById('edit-row-'+j);
+    if(er)er.style.display='none';
+  });
+  const er=document.getElementById('edit-row-'+i);
+  if(er){er.style.display='';
+    // 포커스
+    const qEl=document.getElementById('edit-qty-'+i);
+    if(qEl)setTimeout(()=>qEl.select(),50);
+  }
+}
+
+function hideEditRow(i){
+  const er=document.getElementById('edit-row-'+i);
+  if(er)er.style.display='none';
+}
+
+function applyEditRow(i){
+  const qty=parseFloat(document.getElementById('edit-qty-'+i).value);
+  const buy=parseFloat(document.getElementById('edit-buy-'+i).value);
+  if(isNaN(qty)||qty<=0){alert('수량을 올바르게 입력해주세요.');return;}
+  if(isNaN(buy)||buy<=0){alert('평균매수가를 올바르게 입력해주세요.');return;}
+  const prev={qty:S.stocks[i].qty,buy:S.stocks[i].buy};
+  S.stocks[i].qty=qty;
+  S.stocks[i].buy=buy;
+  sv();
+  hideEditRow(i);
+  renderDash();
+  // 변경 내용 간단히 표시
+  const td=document.getElementById('td-qty-'+i);
+  const tb=document.getElementById('td-buy-'+i);
+  [td,tb].forEach(el=>{
+    if(!el)return;
+    el.style.transition='background .3s';
+    el.style.background='rgba(79,142,247,.25)';
+    setTimeout(()=>{el.style.background='';},1200);
+  });
 }
 
 let chartInst=null;
