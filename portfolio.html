@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -343,6 +344,7 @@ function sv(){
   localStorage.setItem('pf_h',JSON.stringify(S.hist));
   localStorage.setItem('pf_ah',JSON.stringify(S.ah));
   localStorage.setItem('pf_ts',now);
+  localStorage.setItem('pf_local_ts',String(Date.now()));
   document.getElementById('ts-label').textContent='저장: '+now;
 }
 function saveAll(){sv();renderAll();}
@@ -771,6 +773,29 @@ function renderAll(){
 document.getElementById('log-date').value=new Date().toISOString().slice(0,10);
 document.getElementById('add-date').value=new Date().toISOString().slice(0,10);
 renderAll();
+
+// === Cloud Sync (state.json from same repo) ===========================
+// 매일 집 PC 자동화가 GitHub 레포의 state.json 을 갱신합니다.
+// 페이지 로드 시 fetch 해서 _pushed_at 이 로컬 pf_local_ts 보다 새것이면
+// localStorage 를 덮어쓰고 화면을 다시 그립니다. 로컬이 더 새것이면 무시.
+(async function syncFromCloud(){
+  try{
+    const r=await fetch('./state.json?t='+Date.now(),{cache:'no-store'});
+    if(!r.ok)return;
+    const remote=await r.json();
+    const remoteTs=Number(remote._pushed_at||0);
+    const localTs=Number(localStorage.getItem('pf_local_ts')||0);
+    if(remoteTs<=localTs)return;
+    ['pf_s','pf_t','pf_l','pf_h','pf_ah','pf_ts'].forEach(k=>{
+      if(remote[k]!==undefined)localStorage.setItem(k,remote[k]);
+    });
+    localStorage.setItem('pf_local_ts',String(remoteTs));
+    S=ld();
+    renderAll();
+    const lbl=document.getElementById('ts-label');
+    if(lbl)lbl.textContent='☁ 클라우드 동기화 — '+(remote.pf_ts||new Date(remoteTs).toLocaleString('ko-KR'));
+  }catch(e){console.log('Cloud sync skipped:',e);}
+})();
 </script>
 </body>
 </html>
