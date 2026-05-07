@@ -740,11 +740,19 @@ function addLog(){
   const memo=document.getElementById('log-memo').value;
   if(!date||!ticker||qty<=0||price<=0){alert('날짜, 종목, 수량, 매도가를 입력해주세요.');return;}
   const s=S.stocks.find(s=>s.name===ticker);
-  S.logs.push({date,ticker,qty,price,buy:s?s.buy:0,memo});
-  sv();renderLog();
+  if(s&&qty>s.qty){if(!confirm(`${ticker} 보유 ${s.qty}주보다 많은 ${qty}주를 매도합니다. 계속하시겠습니까?`))return;}
+  S.logs.push({date,ticker,qty,price,buy:s?s.buy:0,memo,applied:true});
+  if(s)s.qty=Math.max(0,s.qty-qty);
+  sv();renderAll();
   ['log-qty','log-price','log-memo'].forEach(id=>document.getElementById(id).value='');
 }
-function delLog(i){if(confirm('삭제하시겠습니까?')){S.logs.splice(i,1);sv();renderLog();}}
+function delLog(i){
+  if(!confirm('삭제하시겠습니까?\n(applied 표시가 있는 기록은 보유 수량이 매도분만큼 복원됩니다.)'))return;
+  const l=S.logs[i];
+  if(l&&l.applied){const s=S.stocks.find(s=>s.name===l.ticker);if(s)s.qty+=l.qty;}
+  S.logs.splice(i,1);
+  sv();renderAll();
+}
 
 function exportCSV(){
   const rows=['\uFEFF종목,수량,평균매수가,현재가,고점,매수총액,현재총액,평가손익,수익률'];
