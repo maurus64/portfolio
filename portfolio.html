@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -136,6 +135,7 @@ select option{background:var(--bg2)}
   </div>
   <div class="header-right">
     <button class="btn btn-sm" onclick="exportCSV()">CSV</button>
+    <button class="btn btn-sm" onclick="go('sync',this)" style="color:#34d399;border-color:#34d399" id="sync-btn">☁️ 동기화</button>
     <button class="btn btn-sm btn-r" onclick="resetAll()">초기화</button>
     <button class="btn btn-sm btn-p" onclick="saveAll()">저장</button>
   </div>
@@ -143,12 +143,108 @@ select option{background:var(--bg2)}
 
 <div class="tabs">
   <button class="tab active" onclick="go('dashboard',this)">대시보드</button>
+  <button class="tab" onclick="go('sync',this)">☁️ Google 동기화</button>
   <button class="tab" onclick="go('auto',this)">자동 지표</button>
   <button class="tab" onclick="go('price',this)">현재가</button>
   <button class="tab" onclick="go('buy',this)">매수 관리</button>
   <button class="tab" onclick="go('signal',this)">매매 신호</button>
   <button class="tab" onclick="go('tech',this)">기술적 지표</button>
   <button class="tab" onclick="go('log',this)">매도 일지</button>
+</div>
+
+<!-- Google Sheets 동기화 -->
+<div class="panel" id="panel-sync">
+  <div class="alert a-purple" style="margin-bottom:16px">
+    Google Sheets를 데이터 저장소로 사용합니다. 한 번 설정하면 PC·핸드폰 어디서든 동일한 데이터를 사용할 수 있어요.
+  </div>
+
+  <p class="sec">1단계 — Google Apps Script URL 설정</p>
+  <div class="card" style="margin-bottom:12px">
+    <div class="step"><div class="step-num">1</div><div>
+      <div class="step-title">Apps Script 배포 URL 입력</div>
+      <div class="step-desc" style="margin-bottom:8px">아래 가이드 문서를 참고해서 Apps Script를 설정한 뒤 배포 URL을 입력하세요.</div>
+      <div class="ig">
+        <label>Apps Script 웹앱 URL</label>
+        <input type="text" id="gs-url" placeholder="https://script.google.com/macros/s/...../exec" style="font-family:var(--mono);font-size:11px">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+        <button class="btn btn-sm btn-p" onclick="saveGsUrl()">URL 저장</button>
+        <span id="url-status" style="font-size:11px;color:var(--muted)"></span>
+      </div>
+    </div></div>
+  </div>
+
+  <p class="sec">2단계 — 데이터 동기화</p>
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:24px;margin-bottom:6px">☁️→📱</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px">불러오기</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Google Sheets → 이 기기</div>
+        <button class="btn btn-g" style="width:100%" onclick="gsLoad()">불러오기</button>
+      </div>
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:24px;margin-bottom:6px">📱→☁️</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px">저장하기</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">이 기기 → Google Sheets</div>
+        <button class="btn btn-p" style="width:100%" onclick="gsSave()">저장하기</button>
+      </div>
+    </div>
+    <div id="sync-status" class="alert a-neu" style="display:none"></div>
+    <div id="sync-log" style="margin-top:8px;font-size:11px;color:var(--muted)"></div>
+  </div>
+
+  <p class="sec">자동 동기화 설정</p>
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div>
+        <div style="font-size:13px;font-weight:500">페이지 열 때 자동 불러오기</div>
+        <div style="font-size:11px;color:var(--muted)">앱을 열면 자동으로 Google Sheets에서 최신 데이터를 가져옵니다</div>
+      </div>
+      <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+        <input type="checkbox" id="auto-load-toggle" onchange="toggleAutoLoad()" style="opacity:0;width:0;height:0">
+        <span id="toggle-bg" style="position:absolute;inset:0;background:var(--border);border-radius:12px;transition:.3s"></span>
+        <span id="toggle-dot" style="position:absolute;left:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s"></span>
+      </label>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:13px;font-weight:500">저장 시 자동 업로드</div>
+        <div style="font-size:11px;color:var(--muted)">[저장] 버튼 클릭 시 Google Sheets에도 자동 저장</div>
+      </div>
+      <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+        <input type="checkbox" id="auto-save-toggle" onchange="toggleAutoSave()" style="opacity:0;width:0;height:0">
+        <span id="toggle-bg2" style="position:absolute;inset:0;background:var(--border);border-radius:12px;transition:.3s"></span>
+        <span id="toggle-dot2" style="position:absolute;left:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s"></span>
+      </label>
+    </div>
+  </div>
+
+  <p class="sec">Apps Script 설정 가이드</p>
+  <div class="card">
+    <div class="step"><div class="step-num">1</div><div>
+      <div class="step-title">Google Sheets 새 파일 만들기</div>
+      <div class="step-desc">sheets.google.com → 새 스프레드시트 → 이름: "포트폴리오 데이터"</div>
+    </div></div>
+    <div class="step"><div class="step-num">2</div><div>
+      <div class="step-title">Apps Script 열기</div>
+      <div class="step-desc">상단 메뉴 → 확장 프로그램 → Apps Script</div>
+    </div></div>
+    <div class="step"><div class="step-num">3</div><div>
+      <div class="step-title">아래 코드 붙여넣기</div>
+      <div class="step-desc" style="margin-bottom:6px">기존 코드를 모두 지우고 아래 코드를 붙여넣으세요.</div>
+      <div class="code" onclick="copyCode(this, gsCode())" style="max-height:120px;overflow:auto;white-space:pre-wrap;line-height:1.5">// 아래 [코드 복사] 버튼을 클릭하세요<span class="copy-hint">클릭 복사</span></div>
+      <button class="btn btn-sm btn-p" onclick="copyGsCode()" style="margin-top:6px">📋 Apps Script 코드 복사</button>
+    </div></div>
+    <div class="step"><div class="step-num">4</div><div>
+      <div class="step-title">웹앱으로 배포</div>
+      <div class="step-desc">오른쪽 상단 [배포] → [새 배포] → 유형: 웹앱 → 액세스 권한: 모든 사용자 → [배포] → URL 복사</div>
+    </div></div>
+    <div class="step"><div class="step-num">5</div><div>
+      <div class="step-title">위 1단계에 URL 붙여넣기</div>
+      <div class="step-desc">복사한 URL을 위 입력칸에 붙여넣고 [URL 저장] 클릭</div>
+    </div></div>
+  </div>
 </div>
 
 <!-- 대시보드 -->
@@ -344,10 +440,162 @@ function sv(){
   localStorage.setItem('pf_h',JSON.stringify(S.hist));
   localStorage.setItem('pf_ah',JSON.stringify(S.ah));
   localStorage.setItem('pf_ts',now);
-  localStorage.setItem('pf_local_ts',String(Date.now()));
   document.getElementById('ts-label').textContent='저장: '+now;
+  // 자동 Google Sheets 저장
+  if(localStorage.getItem('pf_auto_save')==='1'&&getGsUrl()){
+    gsSave(true); // silent=true
+  }
 }
 function saveAll(){sv();renderAll();}
+
+// ── Google Sheets 동기화 함수 ─────────────────────────
+function gsCode(){
+return `// 포트폴리오 Apps Script 코드 — Google Sheets에 붙여넣기
+const SHEET_NAME = '포트폴리오';
+
+function doGet(e) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) { sheet = ss.insertSheet(SHEET_NAME); }
+    const data = sheet.getRange('A1').getValue();
+    const output = ContentService.createTextOutput(data||'{}');
+    output.setMimeType(ContentService.MimeType.JSON);
+    return output;
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({error:err.message}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doPost(e) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) { sheet = ss.insertSheet(SHEET_NAME); }
+    sheet.getRange('A1').setValue(e.postData.contents);
+    sheet.getRange('B1').setValue(new Date().toLocaleString('ko-KR'));
+    return ContentService.createTextOutput(JSON.stringify({ok:true}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({error:err.message}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+}
+
+function copyGsCode(){
+  const code=gsCode();
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(code).then(()=>{
+      alert('✅ Apps Script 코드가 복사되었습니다!\nGoogle Apps Script 편집창에 붙여넣으세요.');
+    }).catch(()=>fallbackCopy(code));
+  } else { fallbackCopy(code); }
+}
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');alert('✅ 코드가 복사되었습니다!');}
+  catch(e){alert('복사 실패: 직접 선택해서 복사해주세요.');}
+  document.body.removeChild(ta);
+}
+
+function getGsUrl(){return localStorage.getItem('pf_gs_url')||'';}
+
+function saveGsUrl(){
+  const url=(document.getElementById('gs-url').value||'').trim();
+  const st=document.getElementById('url-status');
+  if(!url||!url.includes('script.google.com')){
+    st.textContent='❌ 올바른 Apps Script URL이 아닙니다.';st.style.color='var(--red)';return;
+  }
+  localStorage.setItem('pf_gs_url',url);
+  st.textContent='✅ URL 저장됨!';st.style.color='var(--green)';
+}
+
+function setSyncStatus(msg,type){
+  const el=document.getElementById('sync-status');
+  if(!el)return;
+  el.style.display='block';
+  el.className='alert '+(type==='ok'?'a-good':type==='err'?'a-warn':'a-info');
+  el.textContent=msg;
+}
+function addSyncLog(msg){
+  const el=document.getElementById('sync-log');
+  if(!el)return;
+  const t=new Date().toLocaleTimeString('ko-KR');
+  el.innerHTML='['+t+'] '+msg+'<br>'+el.innerHTML;
+}
+
+async function gsSave(silent){
+  const url=getGsUrl();
+  if(!url){if(!silent)setSyncStatus('❌ Apps Script URL을 먼저 설정해주세요.','err');return;}
+  if(!silent)setSyncStatus('⏳ Google Sheets에 저장 중...','info');
+  const payload=JSON.stringify({stocks:S.stocks,tech:S.tech,logs:S.logs,hist:S.hist,ah:S.ah,ts:S.ts});
+  try{
+    await fetch(url,{method:'POST',mode:'no-cors',body:payload});
+    if(!silent){setSyncStatus('✅ Google Sheets 저장 완료!','ok');addSyncLog('저장 완료 ('+S.stocks.length+'개 종목)');}
+  }catch(e){
+    if(!silent){setSyncStatus('⚠️ 저장 요청 전송됨 (Sheets에서 확인하세요)','info');addSyncLog('전송됨 (오류: '+e.message+')');}
+  }
+}
+
+async function gsLoad(){
+  const url=getGsUrl();
+  if(!url){setSyncStatus('❌ Apps Script URL을 먼저 설정해주세요.','err');return;}
+  setSyncStatus('⏳ Google Sheets에서 불러오는 중...','info');
+  try{
+    const resp=await fetch(url,{method:'GET',mode:'cors'});
+    const text=await resp.text();
+    if(!text||text==='{}'){setSyncStatus('⚠️ 저장된 데이터가 없습니다. 먼저 저장해주세요.','err');return;}
+    const data=JSON.parse(text);
+    if(data.error){setSyncStatus('❌ 오류: '+data.error,'err');return;}
+    if(!data.stocks||!data.stocks.length){setSyncStatus('⚠️ 저장된 종목이 없습니다.','err');return;}
+    if(!confirm('Google Sheets 데이터로 교체하시겠습니까?\n\n종목 수: '+data.stocks.length+'개\n저장 시각: '+(data.ts||'불명')+'\n\n현재 기기 데이터는 덮어씌워집니다.'))return;
+    S.stocks=data.stocks;
+    S.tech=data.tech||data.stocks.map(s=>({name:s.name,vwap:0,rsi:0,ma5:0,ma20:0}));
+    S.logs=data.logs||[];S.hist=data.hist||[];S.ah=data.ah||[];S.ts=data.ts||'';
+    sv();renderAll();
+    setSyncStatus('✅ 불러오기 완료! ('+S.stocks.length+'개 종목, 저장시각: '+S.ts+')','ok');
+    addSyncLog('불러오기 완료');
+  }catch(e){
+    setSyncStatus('❌ 불러오기 실패: '+e.message+'\nApps Script 재배포 또는 CORS 설정을 확인하세요.','err');
+    addSyncLog('실패: '+e.message);
+  }
+}
+
+function toggleAutoLoad(){
+  const on=document.getElementById('auto-load-toggle').checked;
+  localStorage.setItem('pf_auto_load',on?'1':'0');
+  document.getElementById('toggle-bg').style.background=on?'var(--green)':'var(--border)';
+  document.getElementById('toggle-dot').style.left=on?'22px':'2px';
+}
+function toggleAutoSave(){
+  const on=document.getElementById('auto-save-toggle').checked;
+  localStorage.setItem('pf_auto_save',on?'1':'0');
+  document.getElementById('toggle-bg2').style.background=on?'var(--accent)':'var(--border)';
+  document.getElementById('toggle-dot2').style.left=on?'22px':'2px';
+}
+
+function initSyncUI(){
+  const url=getGsUrl();
+  const el=document.getElementById('gs-url');
+  if(el&&url)el.value=url;
+  const al=localStorage.getItem('pf_auto_load')==='1';
+  const as_=localStorage.getItem('pf_auto_save')==='1';
+  const alt=document.getElementById('auto-load-toggle');
+  const ast=document.getElementById('auto-save-toggle');
+  if(alt)alt.checked=al;if(ast)ast.checked=as_;
+  if(al){const b=document.getElementById('toggle-bg');const d=document.getElementById('toggle-dot');if(b)b.style.background='var(--green)';if(d)d.style.left='22px';}
+  if(as_){const b=document.getElementById('toggle-bg2');const d=document.getElementById('toggle-dot2');if(b)b.style.background='var(--accent)';if(d)d.style.left='22px';}
+  // 자동 불러오기
+  if(al&&url){
+    setTimeout(async()=>{
+      setSyncStatus&&setSyncStatus('⏳ 자동 불러오기 실행 중...','info');
+      await gsLoad();
+    },800);
+  }
+}
 
 function resetAll(){
   if(!confirm('⚠️ 전체 초기화\n\n모든 데이터(종목, 지표, 매도 이력)가 삭제됩니다.\n정말 초기화하시겠습니까?'))return;
@@ -740,19 +988,11 @@ function addLog(){
   const memo=document.getElementById('log-memo').value;
   if(!date||!ticker||qty<=0||price<=0){alert('날짜, 종목, 수량, 매도가를 입력해주세요.');return;}
   const s=S.stocks.find(s=>s.name===ticker);
-  if(s&&qty>s.qty){if(!confirm(`${ticker} 보유 ${s.qty}주보다 많은 ${qty}주를 매도합니다. 계속하시겠습니까?`))return;}
-  S.logs.push({date,ticker,qty,price,buy:s?s.buy:0,memo,applied:true});
-  if(s)s.qty=Math.max(0,s.qty-qty);
-  sv();renderAll();
+  S.logs.push({date,ticker,qty,price,buy:s?s.buy:0,memo});
+  sv();renderLog();
   ['log-qty','log-price','log-memo'].forEach(id=>document.getElementById(id).value='');
 }
-function delLog(i){
-  if(!confirm('삭제하시겠습니까?\n(applied 표시가 있는 기록은 보유 수량이 매도분만큼 복원됩니다.)'))return;
-  const l=S.logs[i];
-  if(l&&l.applied){const s=S.stocks.find(s=>s.name===l.ticker);if(s)s.qty+=l.qty;}
-  S.logs.splice(i,1);
-  sv();renderAll();
-}
+function delLog(i){if(confirm('삭제하시겠습니까?')){S.logs.splice(i,1);sv();renderLog();}}
 
 function exportCSV(){
   const rows=['\uFEFF종목,수량,평균매수가,현재가,고점,매수총액,현재총액,평가손익,수익률'];
@@ -781,29 +1021,7 @@ function renderAll(){
 document.getElementById('log-date').value=new Date().toISOString().slice(0,10);
 document.getElementById('add-date').value=new Date().toISOString().slice(0,10);
 renderAll();
-
-// === Cloud Sync (state.json from same repo) ===========================
-// 매일 집 PC 자동화가 GitHub 레포의 state.json 을 갱신합니다.
-// 페이지 로드 시 fetch 해서 _pushed_at 이 로컬 pf_local_ts 보다 새것이면
-// localStorage 를 덮어쓰고 화면을 다시 그립니다. 로컬이 더 새것이면 무시.
-(async function syncFromCloud(){
-  try{
-    const r=await fetch('./state.json?t='+Date.now(),{cache:'no-store'});
-    if(!r.ok)return;
-    const remote=await r.json();
-    const remoteTs=Number(remote._pushed_at||0);
-    const localTs=Number(localStorage.getItem('pf_local_ts')||0);
-    if(remoteTs<=localTs)return;
-    ['pf_s','pf_t','pf_l','pf_h','pf_ah','pf_ts'].forEach(k=>{
-      if(remote[k]!==undefined)localStorage.setItem(k,remote[k]);
-    });
-    localStorage.setItem('pf_local_ts',String(remoteTs));
-    S=ld();
-    renderAll();
-    const lbl=document.getElementById('ts-label');
-    if(lbl)lbl.textContent='☁ 클라우드 동기화 — '+(remote.pf_ts||new Date(remoteTs).toLocaleString('ko-KR'));
-  }catch(e){console.log('Cloud sync skipped:',e);}
-})();
+initSyncUI();
 </script>
 </body>
 </html>
