@@ -368,11 +368,6 @@ select option{background:var(--bg2)}
 
 <!-- 기술적 지표 -->
 <div class="panel" id="panel-tech">
-  <div class="alert a-info" style="margin-bottom:12px">자동 지표 탭에서 JSON을 적용하면 자동으로 채워집니다. 수동 입력도 가능합니다.</div>
-  <p class="sec">기술적 지표 <span class="tag" id="tech-ts"></span></p>
-  <div id="tech-grid"></div>
-  <button class="btn btn-p" onclick="applyTech()" style="margin-top:10px">수동 입력 저장</button>
-  <div class="divider"></div>
   <p class="sec">종합 신호</p>
   <div class="tbl-wrap">
     <table><thead><tr>
@@ -382,6 +377,11 @@ select option{background:var(--bg2)}
       <th style="text-align:center">이평선</th><th style="text-align:center">종합</th>
     </tr></thead><tbody id="tech-tb"></tbody></table>
   </div>
+  <div class="divider"></div>
+  <div class="alert a-info" style="margin-bottom:12px">자동 지표 탭에서 JSON을 적용하면 자동으로 채워집니다. 수동 입력도 가능합니다.</div>
+  <p class="sec">기술적 지표 <span class="tag" id="tech-ts"></span></p>
+  <div id="tech-grid"></div>
+  <button class="btn btn-p" onclick="applyTech()" style="margin-top:10px">수동 입력 저장</button>
 </div>
 
 <!-- 매도 일지 -->
