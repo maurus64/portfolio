@@ -60,6 +60,7 @@ tr:hover td{background:var(--bg3)}
 .b-sell{background:#7c2d12;color:var(--gold)}
 .b-cut{background:#450a0a;color:var(--red)}
 .b-add{background:#1e3a5f;color:var(--accent)}
+.b-warn{background:#2e2600;color:#e0b020}
 .b-new{background:#2e1b5e;color:var(--purple)}
 /* 입력 */
 input,select,textarea{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 12px;width:100%;transition:border-color .2s}
@@ -882,6 +883,16 @@ function renderBuy(){
 function delHist(i){if(confirm('삭제하시겠습니까?')){S.hist.splice(i,1);sv();renderBuy();}}
 
 function renderSignal(){
+  function comboSig(s,t){
+    const m=s.cur<=s.peak*0.85?'cut':s.cur>=s.peak*1.05?'sell':s.cur<=s.peak*0.95?'add':'hold';
+    const j=(!(t&&t.vwap>0&&t.rsi>0&&t.ma5>0&&t.ma20>0))?'na':(s.cur>t.vwap&&t.ma5>t.ma20&&t.rsi<70)?'good':(s.cur<t.vwap&&t.ma5<t.ma20&&t.rsi>30)?'bad':'neu';
+    let label,cls;
+    if(m==='cut'){label='손절 검토';cls='b-cut';}
+    else if(m==='sell'){label='매도 검토';cls='b-sell';}
+    else if(m==='add'){label=j==='good'?'분할매수 (흐름양호)':j==='bad'?'분할매수 (하락흐름)':'분할매수 (중립흐름)';cls=j==='bad'?'b-warn':'b-add';}
+    else{label=j==='good'?'보유 (흐름양호)':j==='bad'?'보유 (흐름주의)':'보유 (일반)';cls=j==='bad'?'b-warn':j==='good'?'b-buy':'b-hold';}
+    return {label,cls,m,j};
+  }
   const ab=document.getElementById('alerts-box');ab.innerHTML='';
   const cuts=S.stocks.filter(s=>s.cur<=s.peak*0.85);
   const sells=S.stocks.filter(s=>s.cur>=s.peak*1.05);
@@ -891,9 +902,9 @@ function renderSignal(){
   if(adds.length){const d=document.createElement('div');d.className='alert a-info';d.innerHTML='<strong>+ 분할매수 고려:</strong> '+adds.map(s=>s.name).join(', ')+' — 고점 대비 5~15% 하락';ab.appendChild(d);}
   if(!cuts.length&&!sells.length&&!adds.length){const d=document.createElement('div');d.className='alert a-neu';d.textContent='현재 특이 신호 없음 — 모두 보유 구간';ab.appendChild(d);}
   const tb=document.getElementById('signal-tb');tb.innerHTML='';
-  S.stocks.forEach(s=>{
+  S.stocks.forEach((s,i)=>{
     const stop=s.peak*0.85,t1=s.peak*1.05,t2=s.peak*1.10;
-    const toStop=(s.cur-stop)/s.cur*100,toT1=(t1-s.cur)/s.cur*100,sg=sig(s);
+    const toStop=(s.cur-stop)/s.cur*100,toT1=(t1-s.cur)/s.cur*100,sg=comboSig(s,S.tech[i]);
     const tr=document.createElement('tr');tr.className=catCls[s.cat]||'';
     tr.innerHTML=`<td><strong>${s.name}</strong></td>
       <td style="text-align:right;font-family:var(--mono)">₩${W(Math.round(s.cur))}</td>
