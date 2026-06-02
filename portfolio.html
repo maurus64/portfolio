@@ -905,6 +905,32 @@ function renderSignal(){
       <td style="text-align:center"><span class="badge ${sg.cls}">${sg.label}</span></td>`;
     tb.appendChild(tr);
   });
+
+  // ===== 종합 브리핑 (매매 신호 x 기술적 지표) =====
+  (function(){
+    const mae=s=>s.cur<=s.peak*0.85?'cut':s.cur>=s.peak*1.05?'sell':s.cur<=s.peak*0.95?'add':'hold';
+    const jong=(s,t)=>(!(t&&t.vwap>0&&t.rsi>0&&t.ma5>0&&t.ma20>0))?'na':(s.cur>t.vwap&&t.ma5>t.ma20&&t.rsi<70)?'good':(s.cur<t.vwap&&t.ma5<t.ma20&&t.rsi>30)?'bad':'neu';
+    const G={cut:[],sell:[],ag:[],an:[],ab:[],hg:[],hb:[],hn:[]};
+    S.stocks.forEach((s,i)=>{const m=mae(s),j=jong(s,S.tech[i]);
+      if(m==='cut')G.cut.push(s.name);
+      else if(m==='sell')G.sell.push(s.name);
+      else if(m==='add'){(j==='good'?G.ag:j==='bad'?G.ab:G.an).push(s.name);}
+      else{(j==='good'?G.hg:j==='bad'?G.hb:G.hn).push(s.name);}});
+    const ln=(e,l,a)=>a.length?'<div style="margin:3px 0">'+e+' <b>'+l+'</b>: '+a.join(', ')+'</div>':'';
+    let h='<div style="font-weight:600;margin-bottom:8px">\uD83D\uDCCB 종합 브리핑 <span style="font-weight:400;opacity:.7;font-size:12px">(매매 신호 \u00D7 기술적 지표)</span></div>';
+    h+='<div style="margin:3px 0">\uD83D\uDD34 <b>손절 검토</b>: '+(G.cut.length?G.cut.join(', '):'없음')+'</div>';
+    h+='<div style="margin:3px 0">\uD83D\uDFE2 <b>매도\u00B7익절 검토</b>: '+(G.sell.length?G.sell.join(', '):'없음')+'</div>';
+    h+=ln('\uD83D\uDD35','분할매수 우선 (눌림 + 기술 우호)',G.ag);
+    h+=ln('\u26AA','분할매수 고려 (흐름 중립)',G.an);
+    h+=ln('\uD83D\uDFE1','분할매수하되 주의 (눌림이나 하락 흐름 \u2014 소액\u00B7관망)',G.ab);
+    h+=ln('\uD83D\uDFE9','보유 \u2014 흐름 양호',G.hg);
+    h+=ln('\uD83D\uDFE7','보유 \u2014 흐름 주의',G.hb);
+    h+=ln('\u26AB','보유 \u2014 일반',G.hn);
+    h+='<div style="margin-top:8px;opacity:.65;font-size:11px">\u203B 매매 신호(고점 대비)와 종합 신호(VWAP\u00B7RSI\u00B7이평선)를 합친 자동 요약입니다. 참고용이며 투자 조언이 아닙니다.</div>';
+    let bx=document.getElementById('signal-briefing');
+    if(!bx){bx=document.createElement('div');bx.id='signal-briefing';bx.className='alert a-info';bx.style.cssText='margin-top:16px;line-height:1.7;text-align:left';document.getElementById('panel-signal').appendChild(bx);}
+    bx.innerHTML=h;
+  })();
 }
 
 function renderTech(){
