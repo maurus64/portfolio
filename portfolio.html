@@ -827,8 +827,13 @@ function updateNewPreview(){
   box.innerHTML=`<div class="preview-row"><span class="preview-label">총 매수금액</span><span style="color:var(--accent);font-weight:600">₩${W(Math.round(qty*price))}</span></div>`;
 }
 
+/* ===== 신규 종목 입력 오류(자판 오타) 점검 ===== */
+const KNOWN_NAMES=["SK하이닉스", "삼성전자", "카카오페이", "KODEX200", "금(Gold)", "이더리움", "비트코인", "삼천당제약", "TIGER 미국우주테크", "현대자동차", "에이비엘바이오", "TIGER 미국S&P500", "LG에너지솔루션", "삼성바이오로직스", "기아", "POSCO홀딩스", "NAVER", "카카오", "LG화학", "삼성SDI", "셀트리온", "KB금융", "신한지주", "하나금융지주", "현대모비스", "삼성물산", "SK이노베이션", "한화에어로스페이스", "HD현대중공업", "두산에너빌리티", "LG전자", "SK텔레콤", "삼성생명", "우리금융지주", "크래프톤", "엔씨소프트", "카카오뱅크", "펄어비스", "에코프로비엠", "에코프로", "알테오젠", "HLB", "리노공업", "KODEX 미국S&P500", "TIGER 미국나스닥100", "KODEX 미국나스닥100", "TIGER 미국필라델피아반도체나스닥", "KODEX 레버리지", "KODEX 200선물인버스2X", "TIGER 차이나전기차SOLACTIVE", "TIGER 2차전지테마", "KODEX 코스닥150", "KODEX 배당성장", "TIGER 미국채10년선물", "리플", "솔라나", "도지코인", "에이다", "은(Silver)"];
+function _nlev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;const d=[];for(let i=0;i<=m;i++)d[i]=[i];for(let j=0;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n];}
+function _nameToast(msg){try{if(window.Notification&&Notification.permission==='granted'){new Notification('포트폴리오 입력 점검',{body:msg});}}catch(e){}}
+function _checkNewName(name){const known=KNOWN_NAMES.concat(S.stocks.map(s=>s.name));if(known.indexOf(name)>=0)return{ok:true};let best=null,bd=99;for(const k of known){const d=_nlev(name,k);if(d<bd){bd=d;best=k;}}if(best&&bd<=2&&bd<=Math.ceil(name.length*0.34))return{suggest:best};return{unknown:true};}
 function applyNewBuy(){
-  const name=document.getElementById('new-name').value.trim();
+  let name=document.getElementById('new-name').value.trim();
   const cat=document.getElementById('new-cat').value;
   const qty=parseFloat(document.getElementById('new-qty').value)||0;
   const price=parseFloat(document.getElementById('new-price').value)||0;
@@ -836,6 +841,14 @@ function applyNewBuy(){
   const peak=parseFloat(document.getElementById('new-peak').value)||price;
   if(!name||qty<=0||price<=0){alert('종목명, 수량, 단가를 입력해주세요.');return;}
   if(S.stocks.find(s=>s.name===name)){alert('이미 존재하는 종목명입니다.');return;}
+  const _chk=_checkNewName(name);
+  if(_chk.suggest){
+    _nameToast('"'+name+'" → 혹시 "'+_chk.suggest+'"?');
+    if(confirm('입력한 종목명 "'+name+'" 이(가) 등록된 이름과 다릅니다.\n혹시 "'+_chk.suggest+'" 인가요?\n\n[확인] "'+_chk.suggest+'" (으)로 추가\n[취소] 입력한 "'+name+'" 그대로 추가'))name=_chk.suggest;
+  }else if(_chk.unknown){
+    _nameToast('"'+name+'" 처음 보는 종목명 — 오타 확인');
+    if(!confirm('"'+name+'" 은(는) 처음 보는 종목명입니다.\n자판 오타가 없는지 확인하세요.\n\n이대로 추가할까요?')){document.getElementById('new-name').focus();return;}
+  }
   S.stocks.push({name,qty,buy:price,peak:Math.max(peak,price),cur:Math.max(cur,price),cat});
   S.tech.push({name,vwap:0,rsi:0,ma5:0,ma20:0});
   S.hist.push({type:'new',date:new Date().toISOString().slice(0,10),name,qty,price,cat});
