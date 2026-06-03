@@ -659,6 +659,17 @@ function applyJSON(){
   document.getElementById('json-input').value='';
 }
 
+function comboSig(s,t){
+  const m=s.cur<=s.peak*0.85?'cut':s.cur>=s.peak*1.05?'sell':s.cur<=s.peak*0.95?'add':'hold';
+  const j=(!(t&&t.vwap>0&&t.rsi>0&&t.ma5>0&&t.ma20>0))?'na':(s.cur>t.vwap&&t.ma5>t.ma20&&t.rsi<70)?'good':(s.cur<t.vwap&&t.ma5<t.ma20&&t.rsi>30)?'bad':'neu';
+  let label,cls;
+  if(m==='cut'){label='손절 검토';cls='b-cut';}
+  else if(m==='sell'){label='매도 검토';cls='b-sell';}
+  else if(m==='add'){label=j==='good'?'분할매수 (흐름양호)':j==='bad'?'분할매수 (하락흐름)':'분할매수 (중립흐름)';cls=j==='bad'?'b-warn':'b-add';}
+  else{label=j==='good'?'보유 (흐름양호)':j==='bad'?'보유 (흐름주의)':'보유 (일반)';cls=j==='bad'?'b-warn':j==='good'?'b-buy':'b-hold';}
+  return {label,cls,m,j};
+}
+
 function renderDash(){
   let tB=0,tC=0;S.stocks.forEach(s=>{tB+=s.qty*s.buy;tC+=s.qty*s.cur;});
   const pl=tC-tB,pct=tB?pl/tB*100:0;
@@ -670,7 +681,7 @@ function renderDash(){
     <div class="metric"><div class="metric-label">보유 종목</div><div class="metric-value">${S.stocks.length}개</div></div>`;
   const tb=document.getElementById('main-tb');tb.innerHTML='';
   S.stocks.forEach((s,i)=>{
-    const pl=s.qty*s.cur-s.qty*s.buy,pct=s.buy?(s.cur-s.buy)/s.buy*100:0,sg=sig(s);
+    const pl=s.qty*s.cur-s.qty*s.buy,pct=s.buy?(s.cur-s.buy)/s.buy*100:0,sg=comboSig(s,S.tech[i]);
     // 일반 표시 행
     const tr=document.createElement('tr');tr.className=catCls[s.cat]||'';tr.id='row-'+i;
     tr.innerHTML=`<td><strong>${s.name}</strong><br><span style="font-size:11px;color:var(--muted)">${catLbl[s.cat]}</span></td>
