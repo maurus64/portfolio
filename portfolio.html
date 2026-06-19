@@ -541,7 +541,7 @@ async function gsSave(silent){
   }
 }
 
-async function gsLoad(){
+async function gsLoad(silent){
   const url=getGsUrl();
   if(!url){setSyncStatus('❌ Apps Script URL을 먼저 설정해주세요.','err');return;}
   setSyncStatus('⏳ Google Sheets에서 불러오는 중...','info');
@@ -552,7 +552,7 @@ async function gsLoad(){
     const data=JSON.parse(text);
     if(data.error){setSyncStatus('❌ 오류: '+data.error,'err');return;}
     if(!data.stocks||!data.stocks.length){setSyncStatus('⚠️ 저장된 종목이 없습니다.','err');return;}
-    if(!confirm('Google Sheets 데이터로 교체하시겠습니까?\n\n종목 수: '+data.stocks.length+'개\n저장 시각: '+(data.ts||'불명')+'\n\n현재 기기 데이터는 덮어씌워집니다.'))return;
+    if(!silent&&!confirm('Google Sheets 데이터로 교체하시겠습니까?\n\n종목 수: '+data.stocks.length+'개\n저장 시각: '+(data.ts||'불명')+'\n\n현재 기기 데이터는 덮어씌워집니다.'))return;
     S.stocks=data.stocks;
     S.tech=data.tech||data.stocks.map(s=>({name:s.name,vwap:0,rsi:0,ma5:0,ma20:0}));
     S.logs=data.logs||[];S.hist=data.hist||[];S.ah=data.ah||[];S.ts=data.ts||'';
@@ -593,7 +593,7 @@ function initSyncUI(){
   if(al&&url){
     setTimeout(async()=>{
       setSyncStatus&&setSyncStatus('⏳ 자동 불러오기 실행 중...','info');
-      await gsLoad();
+      await gsLoad(true);
     },800);
   }
 }
