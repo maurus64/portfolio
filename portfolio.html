@@ -953,6 +953,22 @@ function renderSignal(){
     if(!bx){bx=document.createElement('div');bx.id='signal-briefing';bx.className='alert a-info';bx.style.cssText='margin-top:16px;line-height:1.7;text-align:left';document.getElementById('panel-signal').appendChild(bx);}
     bx.innerHTML=h;
   })();
+
+  // ===== 익절 검토 레벨 (매수가 기준) =====
+  (function(){
+    let h='<div style="font-weight:600;margin:14px 0 6px">\uD83D\uDCB0 익절 검토 레벨 <span style="font-weight:400;opacity:.7;font-size:12px">(매수가 기준 \u00B7 도달 시 \u2713)</span></div>';
+    h+='<div class="tbl-wrap"><table><thead><tr><th>종목</th><th style="text-align:right">현재가</th><th style="text-align:right">수익률</th><th style="text-align:right">+50%</th><th style="text-align:right">+75%</th><th style="text-align:right">+100%</th></tr></thead><tbody>';
+    S.stocks.forEach(s=>{
+      const pct=s.buy?(s.cur/s.buy-1)*100:0;
+      const cell=p=>{const v=s.buy*p, hit=s.cur>=v; return '<td style="text-align:right;font-family:var(--mono)'+(hit?';color:var(--green)':'')+'">\u20A9'+W(Math.round(v))+(hit?' \u2713':'')+'</td>';};
+      h+='<tr class="'+(catCls[s.cat]||'')+'"><td><strong>'+s.name+'</strong></td><td style="text-align:right;font-family:var(--mono)">\u20A9'+W(Math.round(s.cur))+'</td><td style="text-align:right;font-family:var(--mono)" class="'+(pct>=0?'green':'red')+'">'+P(pct)+'</td>'+cell(1.5)+cell(1.75)+cell(2.0)+'</tr>';
+    });
+    h+='</tbody></table></div>';
+    h+='<div style="margin-top:6px;opacity:.7;font-size:11px">\u203B 매수 평단 대비 +50/75/100% 절대가입니다. 한 번에 전량보다 <b>레벨마다 일부씩 단계적 익절</b>을 권장하며, 도달한 레벨은 \u2713 로 표시됩니다. 위 손절/목표가 표의 1\u00B72차목표(고점+5%/+10%)와 <b>추세 이탈(신고가 \u221210% 또는 MA20 이탈)</b>도 함께 보세요. 참고용이며 투자 조언이 아닙니다.</div>';
+    let bx=document.getElementById('profit-levels');
+    if(!bx){bx=document.createElement('div');bx.id='profit-levels';document.getElementById('panel-signal').appendChild(bx);}
+    bx.innerHTML=h;
+  })();
 }
 
 function renderTech(){
