@@ -358,9 +358,9 @@ select option{background:var(--bg2)}
   <div class="tbl-wrap">
     <table><thead><tr>
       <th>종목</th><th style="text-align:right">현재가</th>
-      <th style="text-align:right">손절가<br><small style="font-weight:400;color:var(--red)">(고점-15%)</small></th>
-      <th style="text-align:right">1차목표<br><small style="font-weight:400;color:var(--green)">(고점+5%)</small></th>
-      <th style="text-align:right">2차목표<br><small style="font-weight:400;color:var(--green)">(고점+10%)</small></th>
+      <th style="text-align:right">손절가<br><small style="font-weight:400;color:var(--red)">(계획)</small></th>
+      <th style="text-align:right">1차목표<br><small style="font-weight:400;color:var(--green)">(계획)</small></th>
+      <th style="text-align:right">2차목표<br><small style="font-weight:400;color:var(--green)">(계획)</small></th>
       <th style="text-align:right">손절까지</th><th style="text-align:right">목표까지</th>
       <th style="text-align:center">신호</th>
     </tr></thead><tbody id="signal-tb"></tbody></table>
@@ -680,8 +680,10 @@ function applyJSON(){
   document.getElementById('json-input').value='';
 }
 
+const PLAN_LEVELS={'SK하이닉스':[1850000,3065000,3500000],'삼성전자':[265000,400000,500000],'현대차':[470000,580000,660000],'KODEX200':[117000,150000,160000],'한화에어로스페이스':[1000000,1350000,1540000]};
+
 function comboSig(s,t){
-  const m=s.cur<=s.peak*0.85?'cut':s.cur>=s.peak*1.05?'sell':s.cur<=s.peak*0.95?'add':'hold';
+  const _pl=PLAN_LEVELS[s.name];const m=s.cur<=(_pl?_pl[0]:s.peak*0.85)?'cut':s.cur>=(_pl?_pl[1]:s.peak*1.05)?'sell':s.cur<=s.peak*0.95?'add':'hold';
   const j=(!(t&&t.vwap>0&&t.rsi>0&&t.ma5>0&&t.ma20>0))?'na':(s.cur>t.vwap&&t.ma5>t.ma20&&t.rsi<70)?'good':(s.cur<t.vwap&&t.ma5<t.ma20&&t.rsi>30)?'bad':'neu';
   let label,cls;
   if(m==='cut'){label='손절 검토';cls='b-cut';}
@@ -916,7 +918,7 @@ function delHist(i){if(confirm('삭제하시겠습니까?')){S.hist.splice(i,1);
 
 function renderSignal(){
   function comboSig(s,t){
-    const m=s.cur<=s.peak*0.85?'cut':s.cur>=s.peak*1.05?'sell':s.cur<=s.peak*0.95?'add':'hold';
+    const _pl=PLAN_LEVELS[s.name];const m=s.cur<=(_pl?_pl[0]:s.peak*0.85)?'cut':s.cur>=(_pl?_pl[1]:s.peak*1.05)?'sell':s.cur<=s.peak*0.95?'add':'hold';
     const j=(!(t&&t.vwap>0&&t.rsi>0&&t.ma5>0&&t.ma20>0))?'na':(s.cur>t.vwap&&t.ma5>t.ma20&&t.rsi<70)?'good':(s.cur<t.vwap&&t.ma5<t.ma20&&t.rsi>30)?'bad':'neu';
     let label,cls;
     if(m==='cut'){label='손절 검토';cls='b-cut';}
@@ -935,7 +937,7 @@ function renderSignal(){
   if(!cuts.length&&!sells.length&&!adds.length){const d=document.createElement('div');d.className='alert a-neu';d.textContent='현재 특이 신호 없음 — 모두 보유 구간';ab.appendChild(d);}
   const tb=document.getElementById('signal-tb');tb.innerHTML='';
   S.stocks.forEach((s,i)=>{
-    const stop=s.peak*0.85,t1=s.peak*1.05,t2=s.peak*1.10;
+    const _pl=PLAN_LEVELS[s.name];const stop=_pl?_pl[0]:s.peak*0.85,t1=_pl?_pl[1]:s.peak*1.05,t2=_pl?_pl[2]:s.peak*1.10;
     const toStop=(s.cur-stop)/s.cur*100,toT1=(t1-s.cur)/s.cur*100,sg=comboSig(s,S.tech[i]);
     const tr=document.createElement('tr');tr.className=catCls[s.cat]||'';
     tr.innerHTML=`<td><strong>${s.name}</strong></td>
