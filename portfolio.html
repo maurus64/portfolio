@@ -145,8 +145,6 @@ select option{background:var(--bg2)}
 <div class="tabs">
   <button class="tab active" onclick="go('dashboard',this)">대시보드</button>
   <button class="tab" onclick="go('sync',this)">☁️ Google 동기화</button>
-  <button class="tab" onclick="go('auto',this)">자동 지표</button>
-  <button class="tab" onclick="go('price',this)">현재가</button>
   <button class="tab" onclick="go('buy',this)">매수 관리</button>
   <button class="tab" onclick="go('signal',this)">매매 신호</button>
   <button class="tab" onclick="go('tech',this)">기술적 지표</button>
@@ -262,53 +260,6 @@ select option{background:var(--bg2)}
     </tr></thead><tbody id="main-tb"></tbody></table>
   </div>
   <div class="chart-wrap"><canvas id="plChart"></canvas></div>
-</div>
-
-<!-- 자동 지표 -->
-<div class="panel" id="panel-auto">
-  <div class="alert a-purple" style="margin-bottom:16px">
-    Python 스크립트(tech_indicators.py)를 실행한 뒤 출력된 JSON을 아래에 붙여넣으면 지표가 자동 반영됩니다.
-  </div>
-  <p class="sec">1단계 — Python 스크립트 실행</p>
-  <div class="card">
-    <div class="step"><div class="step-num">1</div><div>
-      <div class="step-title">패키지 설치 (최초 1회)</div>
-      <div class="code" onclick="copyCode(this,'pip install yfinance pandas')">pip install yfinance pandas<span class="copy-hint">클릭 복사</span></div>
-    </div></div>
-    <div class="step"><div class="step-num">2</div><div>
-      <div class="step-title">스크립트 실행</div>
-      <div class="code" onclick="copyCode(this,'python tech_indicators.py')">python tech_indicators.py<span class="copy-hint">클릭 복사</span></div>
-    </div></div>
-    <div class="step"><div class="step-num">3</div><div>
-      <div class="step-title">출력된 JSON 전체 복사 후 아래에 붙여넣기</div>
-      <div class="step-desc">또는 생성된 indicators_output.json 파일 내용을 복사하세요.</div>
-    </div></div>
-  </div>
-  <p class="sec">2단계 — JSON 붙여넣기</p>
-  <div class="card">
-    <div class="ig" style="margin-bottom:10px">
-      <label>Python 출력 JSON</label>
-      <textarea id="json-input" rows="8" placeholder='[{"name":"SK하이닉스","cur":1306000,"vwap":1290000,"rsi":58.3,"ma5":1298000,"ma20":1275000},...]'></textarea>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <button class="btn btn-g" onclick="applyJSON()">지표 자동 적용</button>
-      <button class="btn btn-sm" onclick="loadSample()">샘플 테스트</button>
-      <button class="btn btn-sm" onclick="document.getElementById('json-input').value=''">초기화</button>
-      <span class="json-st st-ready" id="json-status">JSON을 붙여넣고 적용하세요</span>
-    </div>
-  </div>
-  <p class="sec">자동 업데이트 이력</p>
-  <div id="auto-hist"></div>
-</div>
-
-<!-- 현재가 -->
-<div class="panel" id="panel-price">
-  <p class="sec">현재가 입력 <span class="tag">매일 업데이트</span></p>
-  <div id="price-grid" class="grid3"></div>
-  <div style="display:flex;gap:8px;margin-top:12px">
-    <button class="btn btn-p" onclick="applyPrices()">적용 및 저장</button>
-    <button class="btn" onclick="resetPrices()">초기화</button>
-  </div>
 </div>
 
 <!-- 매수 관리 -->
@@ -1142,7 +1093,7 @@ function renderPlan(){
 }
 
 function renderAll(){
-  renderDash();renderPrice();renderBuy();renderSignal();renderTech();renderLog();renderAuto();renderPlan();
+  renderDash();renderBuy();renderSignal();renderTech();renderLog();renderPlan();
   if(S.ts)document.getElementById('ts-label').textContent='저장: '+S.ts;
 }
 
