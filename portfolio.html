@@ -375,7 +375,7 @@ select option{background:var(--bg2)}
       <th>종목</th><th style="text-align:right">현재가</th>
       <th style="text-align:right">VWAP</th><th style="text-align:center">VWAP</th>
       <th style="text-align:right">RSI</th><th style="text-align:center">RSI</th>
-      <th style="text-align:center">이평선</th><th style="text-align:center">종합</th>
+      <th style="text-align:center">이평선</th><th style="text-align:center">종합</th><th style="text-align:center">이격도(50)</th>
     </tr></thead><tbody id="tech-tb"></tbody></table>
   </div>
   <div class="divider"></div>
@@ -1017,6 +1017,7 @@ function renderTech(){
   const tb=document.getElementById('tech-tb');tb.innerHTML='';
   S.tech.forEach((t,i)=>{
     const s=S.stocks[i];if(!s)return;
+    const dis50=(t.ma50>0)?(s.cur/t.ma50*100):null;const disC=dis50===null?'-':dis50.toFixed(1)+' <span class="badge '+(dis50>=110?'b-cut':dis50<=90?'b-buy':'b-hold')+'" style="font-size:9px">'+(dis50>=110?'과열':dis50<=90?'과매도':'중립')+'</span>';
     const vSig=t.vwap>0?(s.cur>t.vwap?'<span class="green">▲ 상회</span>':'<span class="red">▼ 하회</span>'):'-';
     const rSig=t.rsi>0?(t.rsi>=70?'<span class="badge b-cut">과매수</span>':t.rsi<=30?'<span class="badge b-buy">과매도</span>':'<span class="badge b-hold">중립</span>'):'-';
     const mSig=t.ma5>0&&t.ma20>0?(t.ma5>t.ma20?'<span class="badge b-add">골든</span>':'<span class="badge b-cut">데드</span>'):'-';
@@ -1031,7 +1032,7 @@ function renderTech(){
       <td style="text-align:right;font-family:var(--mono)">${t.rsi||'-'}</td>
       <td style="text-align:center">${rSig}</td>
       <td style="text-align:center">${mSig}</td>
-      <td style="text-align:center">${all}</td>`;
+      <td style="text-align:center">${all}</td><td style="text-align:center;font-family:var(--mono)">${disC}</td>`;
     tb.appendChild(tr);
   });
 }
