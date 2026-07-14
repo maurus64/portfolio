@@ -260,6 +260,7 @@ select option{background:var(--bg2)}
     </tr></thead><tbody id="main-tb"></tbody></table>
   </div>
   <div class="chart-wrap"><canvas id="plChart"></canvas></div>
+  <div id="cash-sec"></div>
 </div>
 
 <!-- 매수 관리 -->
@@ -401,8 +402,9 @@ function ld(){
     logs:JSON.parse(localStorage.getItem('pf_l')||'[]'),
     hist:JSON.parse(localStorage.getItem('pf_h')||'[]'),
     ah:JSON.parse(localStorage.getItem('pf_ah')||'[]'),
-    ts:localStorage.getItem('pf_ts')||''
-  };}catch(e){return{stocks:DEF.map(s=>({...s})),tech:DEF.map(s=>({name:s.name,vwap:0,rsi:0,ma5:0,ma20:0})),logs:[],hist:[],ah:[],ts:''};}
+    ts:localStorage.getItem('pf_ts')||'',
+    cash:JSON.parse(localStorage.getItem('pf_cash')||'[]')
+  };}catch(e){return{stocks:DEF.map(s=>({...s})),tech:DEF.map(s=>({name:s.name,vwap:0,rsi:0,ma5:0,ma20:0})),logs:[],hist:[],ah:[],ts:'',cash:[]};}
 }
 let S=ld();
 
@@ -414,6 +416,7 @@ function sv(){
   localStorage.setItem('pf_h',JSON.stringify(S.hist));
   localStorage.setItem('pf_ah',JSON.stringify(S.ah));
   localStorage.setItem('pf_ts',now);
+  localStorage.setItem('pf_cash',JSON.stringify(S.cash||[]));
   document.getElementById('ts-label').textContent='저장: '+now;
   // 자동 Google Sheets 저장
   if(localStorage.getItem('pf_auto_save')==='1'&&getGsUrl()){
@@ -505,7 +508,7 @@ async function gsSave(silent){
   const url=getGsUrl();
   if(!url){if(!silent)setSyncStatus('❌ Apps Script URL을 먼저 설정해주세요.','err');return;}
   if(!silent)setSyncStatus('⏳ Google Sheets에 저장 중...','info');
-  const payload=JSON.stringify({stocks:S.stocks,tech:S.tech,logs:S.logs,hist:S.hist,ah:S.ah,ts:S.ts});
+  const payload=JSON.stringify({stocks:S.stocks,tech:S.tech,logs:S.logs,hist:S.hist,ah:S.ah,ts:S.ts,cash:S.cash||[]});
   try{
     await fetch(url,{method:'POST',mode:'no-cors',body:payload});
     if(!silent){setSyncStatus('✅ Google Sheets 저장 완료!','ok');addSyncLog('저장 완료 ('+S.stocks.length+'개 종목)');}
@@ -528,7 +531,7 @@ async function gsLoad(silent){
     if(!silent&&!confirm('Google Sheets 데이터로 교체하시겠습니까?\n\n종목 수: '+data.stocks.length+'개\n저장 시각: '+(data.ts||'불명')+'\n\n현재 기기 데이터는 덮어씌워집니다.'))return;
     S.stocks=data.stocks;
     S.tech=data.tech||data.stocks.map(s=>({name:s.name,vwap:0,rsi:0,ma5:0,ma20:0}));
-    S.logs=data.logs||[];S.hist=data.hist||[];S.ah=data.ah||[];S.ts=data.ts||'';
+    S.logs=data.logs||[];S.hist=data.hist||[];S.ah=data.ah||[];S.ts=data.ts||'';S.cash=data.cash||[];
     sv();renderAll();
     setSyncStatus('✅ 불러오기 완료! ('+S.stocks.length+'개 종목, 저장시각: '+S.ts+')','ok');
     addSyncLog('불러오기 완료');
@@ -645,6 +648,45 @@ function comboSig(s,t){
   return {label,cls,m,j};
 }
 
+function taxLimit(){return +(localStorage.getItem('pf_taxlimit')||9000000);}
+function setTaxLimit(){const v=prompt('연말정산 세액공제 한도(원)',taxLimit());if(v===null)return;const n=Math.round(+v||0);if(n>0){localStorage.setItem('pf_taxlimit',n);renderCash();}}
+function addCash(){const name=(prompt('계좌/현금 이름 (예: 연금저축 CMA, IRP, 금현물)')||'').trim();if(!name)return;const bal=Math.round(+prompt('현재 잔액(원)','0')||0);const tax=confirm('절세 계좌입니까? 연금저축·IRP는 [확인], 그 외는 [취소]');let ytd=0;if(tax){ytd=Math.round(+prompt('올해 납입액(원)','0')||0);}S.cash=S.cash||[];S.cash.push({name,bal,tax,ytd});sv();renderAll();}
+function editCash(i){const c=(S.cash||[])[i];if(!c)return;const b=prompt('잔액(원) — '+c.name,Math.round(c.bal||0));if(b===null)return;c.bal=Math.round(+b||0);if(c.tax){const y=prompt('올해 납입액(원) — '+c.name,Math.round(c.ytd||0));if(y!==null)c.ytd=Math.round(+y||0);}sv();renderAll();}
+function delCash(i){const c=(S.cash||[])[i];if(!c)return;if(!confirm(c.name+' 계좌를 삭제할까요?'))return;S.cash.splice(i,1);sv();renderAll();}
+function renderCash(){
+  const el=document.getElementById('cash-sec');if(!el)return;
+  const cash=S.cash||[];
+  const cashTot=cash.reduce((a,c)=>a+(+c.bal||0),0);
+  let stockTot=0;S.stocks.forEach(s=>{if(s.cat!=='cash')stockTot+=s.qty*s.cur;});
+  const total=stockTot+cashTot;
+  const LIM=taxLimit();
+  const taxA=cash.filter(c=>c.tax);
+  const ytdTot=taxA.reduce((a,c)=>a+(+c.ytd||0),0);
+  const pctY=Math.min(100,LIM?ytdTot/LIM*100:0);
+  const bs='color:var(--accent);border-color:var(--accent);font-size:11px';
+  const bd='color:var(--red);border-color:var(--red);font-size:11px';
+  const rows=cash.map((c,i)=>`<tr>
+    <td><strong>${c.name}</strong>${c.tax?' <span class="badge b-add" style="font-size:10px">절세</span>':''}${c.tax?'<br><span style="font-size:11px;color:var(--muted)">올해 납입 ₩'+W(Math.round(+c.ytd||0))+'</span>':''}</td>
+    <td style="text-align:right;font-family:var(--mono)">₩${W(Math.round(+c.bal||0))}</td>
+    <td style="text-align:center"><button class="btn btn-sm" style="${bs}" onclick="editCash(${i})">수정</button> <button class="btn btn-sm" style="${bd}" onclick="delCash(${i})">삭제</button></td></tr>`).join('');
+  el.innerHTML=`<div class="divider"></div>
+    <p class="sec">현금·계좌</p>
+    <div class="tbl-wrap"><table><thead><tr><th>계좌</th><th style="text-align:right">잔액</th><th style="text-align:center">관리</th></tr></thead><tbody>${rows||'<tr><td colspan="3" style="color:var(--muted);text-align:center;padding:14px">등록된 현금·계좌가 없습니다.</td></tr>'}</tbody></table></div>
+    <button class="btn btn-sm btn-p" style="margin-top:8px" onclick="addCash()">＋ 계좌 추가</button>
+    <div class="grid2" style="margin-top:14px">
+      <div class="metric"><div class="metric-label">현금·계좌 합계</div><div class="metric-value accent">₩${W(Math.round(cashTot))}</div></div>
+      <div class="metric"><div class="metric-label">총자산 (주식+현금)</div><div class="metric-value">₩${W(Math.round(total))}</div></div>
+    </div>`;
+  if(taxA.length){
+    el.innerHTML+=`<div style="margin-top:16px">
+      <p class="sec">연말정산 진행률 <span class="tag">연금저축+IRP</span> <button class="btn btn-sm" style="font-size:11px;margin-left:6px" onclick="setTaxLimit()">한도 수정</button></p>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">올해 납입 ₩${W(Math.round(ytdTot))} / 한도 ₩${W(LIM)} · ${pctY.toFixed(0)}%</div>
+      <div style="background:var(--bg3);border-radius:6px;height:14px;overflow:hidden"><div style="height:100%;width:${pctY}%;background:var(--green);transition:width .3s"></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">※ 연금저축 단독 한도 600만원. 정확한 공제율·한도는 소득에 따라 다르니 확인하세요.</div>
+    </div>`;
+  }
+}
+
 function renderDash(){
   let tB=0,tC=0;S.stocks.forEach(s=>{tB+=s.qty*s.buy;tC+=s.qty*s.cur;});
   const pl=tC-tB,pct=tB?pl/tB*100:0;
@@ -690,7 +732,7 @@ function renderDash(){
     </td>`;
     tb.appendChild(er);
   });
-  renderChart();
+  renderChart();renderCash();
 }
 
 function showEditRow(i){
