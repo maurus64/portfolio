@@ -368,18 +368,19 @@ select option{background:var(--bg2)}
   <p class="sec">목표 비중 vs 현재</p>
   <div class="tbl-wrap"><table><thead><tr><th>종목</th><th style="text-align:right">현재</th><th style="text-align:right">목표</th><th style="text-align:center">조정</th></tr></thead><tbody id="plan-tb"></tbody></table></div>
   <div class="divider"></div>
-    <p class="sec">실행 순서</p>
+      <p class="sec">실행 순서</p>
   <div style="line-height:1.7;font-size:13px">
     <b>1단계 — 지금 (관망·방어)</b><br>
     · 신규 매수 <b>보류</b>. 7/22 SK 실적 + 7/28 FOMC 통과까지 관망. 예수금 ₩7.5M은 <b>드라이파우더</b>로 보존.<br>
-    · 매파 연준 + 유가 급등(호르무즈) 국면 → 성급한 투입 금지. 지정가 원칙·공황매도 금지.<br><br>
+    · <b>HD현대중공업(조선·분산) 지표 감시 시작</b> — 진입 밴드 ₩550,000~650,000.<br>
+    · 매파 연준 + 유가 급등(호르무즈) 국면 → 성급한 투입 금지. 지정가·공황매도 금지.<br><br>
     <b>2단계 — 삼성 강세 반등 시 (집중도 완화)</b>
   </div>
   <div class="tbl-wrap" style="margin-top:6px"><table><thead><tr><th>매도(트림)</th><th style="text-align:right">목표</th><th style="text-align:right">익절가(트리거)</th></tr></thead><tbody>
-    <tr><td><strong>삼성전자</strong></td><td style="text-align:right;font-family:var(--mono)">37%→30%</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">₩400,000</td></tr>
+    <tr><td><strong>삼성전자</strong></td><td style="text-align:right;font-family:var(--mono)">37%→28%</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">₩400,000</td></tr>
   </tbody></table></div>
-  <div style="margin-top:8px;line-height:1.7;font-size:13px">→ 트림 대금은 <b>현금(예수금)으로 보존</b>(재투자 보류). 현금 목표 <b>18%</b>.</div>
-  <div style="margin-top:10px;opacity:.7;font-size:11px">※ 익절가 도달 시 분할(sell into strength), 시장가 금지. 손절선: SK 1,850,000 · 삼성 265,000 · <b>현대차 400,000</b>(규칙 통일) · KODEX 117,000. 유가·FOMC 등 시황 변화 시 조정.</div>
+  <div style="margin-top:8px;line-height:1.7;font-size:13px"><b>3단계 — HD현대중공업 분할 진입 (분산)</b><br>→ 조정 시(≤₩650,000) 예수금+삼성 트림 대금으로 <b>2~3회 분할</b>. 목표 비중 <b>8%</b>. 매수 후 손절선 설정.</div>
+  <div style="margin-top:10px;opacity:.7;font-size:11px">※ 익절가 도달 시 분할(sell into strength), 시장가 금지. 손절선: SK 1,850,000 · 삼성 265,000 · 현대차 400,000 · KODEX 117,000. 유가·FOMC·7/22 SK 실적 등 시황 변화 시 조정.</div>
 </div>
 
 <script>
@@ -1118,7 +1119,7 @@ function go(id,btn){
 
 function renderPlan(){
   const el=document.getElementById('plan-tb'); if(!el)return;
-  const TG=[['삼성전자',30],['KODEX200',24],['SK하이닉스',22],['현대차',6],['현금',18]];
+  const TG=[['삼성전자',28],['SK하이닉스',22],['KODEX200',22],['HD현대중공업',8],['현대차',6],['현금',14]];
   const cashDep=(S.cash||[]).filter(c=>!c.tax).reduce((a,c)=>a+(+c.bal||0),0);
   const tot=(S.stocks.reduce((a,s)=>a+s.qty*s.cur,0)+cashDep)||1;
   let html='';
