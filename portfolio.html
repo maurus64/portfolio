@@ -364,23 +364,22 @@ select option{background:var(--bg2)}
 </div>
 
 <div class="panel" id="panel-plan">
-  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 — 2026 연말까지 (스냅샷). 참고용이며 투자 조언이 아닙니다.</div>
+  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 — 2026-07-15 재검토 (방어적 관망). 참고용이며 투자 조언이 아닙니다.</div>
   <p class="sec">목표 비중 vs 현재</p>
   <div class="tbl-wrap"><table><thead><tr><th>종목</th><th style="text-align:right">현재</th><th style="text-align:right">목표</th><th style="text-align:center">조정</th></tr></thead><tbody id="plan-tb"></tbody></table></div>
   <div class="divider"></div>
-  <p class="sec">실행 순서</p>
+    <p class="sec">실행 순서</p>
   <div style="line-height:1.7;font-size:13px">
-    <b>1단계 — 즉시 (신규 진입)</b><br>
-    · 보유 현금 ₩1.3M → <b>한화에어로스페이스 1주</b> 매수(~1,164,000). 분할 1차. <b>매도는 하지 않음</b>(눌림에 winner 안 팜).<br><br>
-    <b>2단계 — 익절가 도달 시 (분할 트림 → 재원 확보)</b>
+    <b>1단계 — 지금 (관망·방어)</b><br>
+    · 신규 매수 <b>보류</b>. 7/22 SK 실적 + 7/28 FOMC 통과까지 관망. 예수금 ₩7.5M은 <b>드라이파우더</b>로 보존.<br>
+    · 매파 연준 + 유가 급등(호르무즈) 국면 → 성급한 투입 금지. 지정가 원칙·공황매도 금지.<br><br>
+    <b>2단계 — 삼성 강세 반등 시 (집중도 완화)</b>
   </div>
-  <div class="tbl-wrap" style="margin-top:6px"><table><thead><tr><th>매도</th><th style="text-align:right">수량</th><th style="text-align:right">익절가(트리거)</th></tr></thead><tbody>
-    <tr><td><strong>삼성전자</strong></td><td style="text-align:right;font-family:var(--mono)">17주</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">₩400,000</td></tr>
-    <tr><td><strong>현대차</strong></td><td style="text-align:right;font-family:var(--mono)">4주</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">₩580,000</td></tr>
-    <tr><td><strong>KODEX200</strong></td><td style="text-align:right;font-family:var(--mono)">22주</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">₩150,000</td></tr>
+  <div class="tbl-wrap" style="margin-top:6px"><table><thead><tr><th>매도(트림)</th><th style="text-align:right">목표</th><th style="text-align:right">익절가(트리거)</th></tr></thead><tbody>
+    <tr><td><strong>삼성전자</strong></td><td style="text-align:right;font-family:var(--mono)">37%→30%</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">₩400,000</td></tr>
   </tbody></table></div>
-  <div style="margin-top:8px;line-height:1.7;font-size:13px">→ 대금으로 <b>한화에어로스페이스 5주 추가</b>(총 6주) + <b>현금 8% 확보</b>.</div>
-  <div style="margin-top:10px;opacity:.7;font-size:11px">※ 트림은 시장가가 아니라 위 익절가 도달 시 분할 실행(sell into strength). 손절선: SK 1,850,000 · 삼성 265,000 · 현대차 470,000 · KODEX 117,000. 시황 변화 시 조정 필요.</div>
+  <div style="margin-top:8px;line-height:1.7;font-size:13px">→ 트림 대금은 <b>현금(예수금)으로 보존</b>(재투자 보류). 현금 목표 <b>18%</b>.</div>
+  <div style="margin-top:10px;opacity:.7;font-size:11px">※ 익절가 도달 시 분할(sell into strength), 시장가 금지. 손절선: SK 1,850,000 · 삼성 265,000 · <b>현대차 400,000</b>(규칙 통일) · KODEX 117,000. 유가·FOMC 등 시황 변화 시 조정.</div>
 </div>
 
 <script>
@@ -635,7 +634,7 @@ function applyJSON(){
   document.getElementById('json-input').value='';
 }
 
-const PLAN_LEVELS={'SK하이닉스':[1850000,3065000,3500000],'삼성전자':[265000,400000,500000],'현대차':[470000,580000,660000],'KODEX200':[117000,150000,160000],'한화에어로스페이스':[1000000,1350000,1540000]};
+const PLAN_LEVELS={'SK하이닉스':[1850000,3065000,3500000],'삼성전자':[265000,400000,500000],'현대차':[400000,580000,660000],'KODEX200':[117000,150000,160000]};
 
 function comboSig(s,t){
   const _pl=PLAN_LEVELS[s.name];const m=s.cur<=(_pl?_pl[0]:s.peak*0.85)?'cut':s.cur>=(_pl?_pl[1]:s.peak*1.05)?'sell':s.cur<=s.peak*0.95?'add':'hold';
@@ -1119,15 +1118,16 @@ function go(id,btn){
 
 function renderPlan(){
   const el=document.getElementById('plan-tb'); if(!el)return;
-  const TG=[['SK하이닉스',22],['삼성전자',26],['KODEX200',22],['현대차',10],['한화에어로스페이스',12],['현금',8]];
-  const tot=S.stocks.reduce((a,s)=>a+s.qty*s.cur,0)||1;
+  const TG=[['삼성전자',30],['KODEX200',24],['SK하이닉스',22],['현대차',6],['현금',18]];
+  const cashDep=(S.cash||[]).filter(c=>!c.tax).reduce((a,c)=>a+(+c.bal||0),0);
+  const tot=(S.stocks.reduce((a,s)=>a+s.qty*s.cur,0)+cashDep)||1;
   let html='';
   TG.forEach(([nm,tw])=>{
     const s=S.stocks.find(x=>x.name===nm);
-    let curTxt, dir;
-    if(nm==='현금'){curTxt='별도';dir='<span style="opacity:.6">확보</span>';}
-    else if(!s){curTxt='미보유';dir='<span style="color:var(--accent)">▲ 신규</span>';}
-    else{const cw=s.qty*s.cur/tot*100, g=cw-tw; curTxt=cw.toFixed(1)+'%';
+    const val=nm==='현금'?cashDep:(s?s.qty*s.cur:0);
+    let curTxt,dir;
+    if(nm!=='현금'&&!s){curTxt='미보유';dir='<span style="color:var(--accent)">▲ 신규</span>';}
+    else{const cw=val/tot*100,g=cw-tw;curTxt=cw.toFixed(1)+'%';
       dir=Math.abs(g)<1?'<span style="opacity:.6">≈ 유지</span>':(g>0?'<span style="color:var(--gold)">▼ 축소 '+g.toFixed(1)+'%p</span>':'<span style="color:var(--accent)">▲ 확대 '+(-g).toFixed(1)+'%p</span>');}
     html+='<tr'+(s?' class="'+(catCls[s.cat]||'')+'"':'')+'><td><strong>'+nm+'</strong></td><td style="text-align:right;font-family:var(--mono)">'+curTxt+'</td><td style="text-align:right;font-family:var(--mono)">'+tw+'%</td><td style="text-align:center;font-size:12px">'+dir+'</td></tr>';
   });
