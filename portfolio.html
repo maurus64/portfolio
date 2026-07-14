@@ -1126,12 +1126,14 @@ function techVerdict(s,t){
   if(rsi)tags.push('RSI '+rsi.toFixed(0)+(rsi>=70?'(과열)':rsi<=30?'(과매도)':''));
   if(dis!=null)tags.push('이격도 '+dis.toFixed(0)+(dis>=110?'(과열)':dis<=90?'(저평가위치)':''));
   if(vr)tags.push('거래량 '+(vr>=1.5?'급증':vr<=0.7?'위축':'보통'));
-  const over=(rsi&&rsi<=30)||(dis!=null&&dis<=90);
+  const deepOver=(rsi&&rsi<=30)||(dis!=null&&dis<=80);
+  const mildOver=(rsi&&rsi<=40)&&(dis!=null&&dis<95);
   const hot=(rsi&&rsi>=70)||(dis!=null&&dis>=110);
   let msg,cls;
-  if(over&&vr>=1.3){msg='과매도 + 거래량 급증 → 바닥 신호 관심(감시)';cls='b-buy';}
-  else if(over){msg='과매도 구간 → 단기 반등 관심(관망)';cls='b-buy';}
+  if(deepOver&&vr>=1.3){msg='과매도 + 거래량 급증 → 바닥 신호 관심';cls='b-buy';}
+  else if(deepOver){msg='과매도 구간 → 단기 반등 관심(관망)';cls='b-buy';}
   else if(hot){msg='과열 구간 → 차익실현 경계';cls='b-cut';}
+  else if(mildOver){msg='약세(추세 하회) → 관망';cls='b-hold';}
   else{msg='중립 → 보유·관망';cls='b-hold';}
   return {tags,msg,cls,tr};
 }
