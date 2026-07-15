@@ -144,7 +144,6 @@ select option{background:var(--bg2)}
 
 <div class="tabs">
   <button class="tab active" onclick="go('dashboard',this)">대시보드</button>
-  <button class="tab" onclick="go('signal',this)">매매 신호</button>
   <button class="tab" onclick="go('tech',this)">기술적 지표</button>
   <button class="tab" onclick="go('buy',this)">매수 관리</button>
   <button class="tab" onclick="go('log',this)">매도 일지</button>
@@ -303,22 +302,6 @@ select option{background:var(--bg2)}
   <div id="buy-history"></div>
 </div>
 
-<!-- 매매 신호 -->
-<div class="panel" id="panel-signal">
-  <div id="alerts-box"></div>
-  <p class="sec">손절 / 목표가 기준표</p>
-  <div class="tbl-wrap">
-    <table><thead><tr>
-      <th>종목</th><th style="text-align:right">현재가</th>
-      <th style="text-align:right">손절가<br><small style="font-weight:400;color:var(--red)">(계획)</small></th>
-      <th style="text-align:right">1차목표<br><small style="font-weight:400;color:var(--green)">(계획)</small></th>
-      <th style="text-align:right">2차목표<br><small style="font-weight:400;color:var(--green)">(계획)</small></th>
-      <th style="text-align:right">손절까지</th><th style="text-align:right">목표까지</th>
-      <th style="text-align:center">신호</th>
-    </tr></thead><tbody id="signal-tb"></tbody></table>
-  </div>
-</div>
-
 <!-- 기술적 지표 -->
 <div class="panel" id="panel-tech">
   <p class="sec">종합 신호</p>
@@ -382,6 +365,15 @@ select option{background:var(--bg2)}
   </tbody></table></div>
   <div style="margin-top:8px;line-height:1.7;font-size:13px"><b>3단계 — HD현대중공업 분할 진입 (분산)</b><br>→ 조정 시(≤₩650,000) 예수금+삼성 트림 대금으로 <b>2~3회 분할</b>. 목표 비중 <b>8%</b>. 매수 후 손절선 설정.</div>
   <div style="margin-top:10px;opacity:.7;font-size:11px">※ 익절가 도달 시 분할(sell into strength), 시장가 금지. 손절선: SK 1,850,000 · 삼성 265,000 · 현대차 400,000 · KODEX 117,000. 유가·FOMC·7/22 SK 실적 등 시황 변화 시 조정.</div>
+  <div class="divider"></div>
+  <p class="sec">손절 / 목표가 (계획 가격선)</p>
+  <div class="tbl-wrap"><table><thead><tr>
+    <th>종목</th><th style="text-align:right">현재가</th>
+    <th style="text-align:right">손절가</th><th style="text-align:right">1차목표</th><th style="text-align:right">2차목표</th>
+    <th style="text-align:right">손절까지</th><th style="text-align:right">목표까지</th>
+    <th style="text-align:center">신호</th>
+  </tr></thead><tbody id="signal-tb"></tbody></table></div>
+  <div id="profit-levels"></div>
 </div>
 
 <script>
@@ -922,16 +914,9 @@ function renderSignal(){
     else{label=j==='good'?'보유 (흐름양호)':j==='bad'?'보유 (흐름주의)':'보유 (일반)';cls=j==='bad'?'b-warn':j==='good'?'b-buy':'b-hold';}
     return {label,cls,m,j};
   }
-  const ab=document.getElementById('alerts-box');ab.innerHTML='';
-  const cuts=S.stocks.filter(s=>s.cur<=s.peak*0.85);
-  const sells=S.stocks.filter(s=>s.cur>=s.peak*1.05);
-  const adds=S.stocks.filter(s=>s.cur<=s.peak*0.95&&s.cur>s.peak*0.85);
-  if(cuts.length){const d=document.createElement('div');d.className='alert a-warn';d.innerHTML='<strong>⚠ 손절 검토:</strong> '+cuts.map(s=>s.name).join(', ')+' — 고점 대비 15% 이상 하락';ab.appendChild(d);}
-  if(sells.length){const d=document.createElement('div');d.className='alert a-good';d.innerHTML='<strong>✓ 매도 검토:</strong> '+sells.map(s=>s.name).join(', ')+' — 1차 목표가 도달';ab.appendChild(d);}
-  if(adds.length){const d=document.createElement('div');d.className='alert a-info';d.innerHTML='<strong>+ 분할매수 고려:</strong> '+adds.map(s=>s.name).join(', ')+' — 고점 대비 5~15% 하락';ab.appendChild(d);}
-  if(!cuts.length&&!sells.length&&!adds.length){const d=document.createElement('div');d.className='alert a-neu';d.textContent='현재 특이 신호 없음 — 모두 보유 구간';ab.appendChild(d);}
-  const tb=document.getElementById('signal-tb');tb.innerHTML='';
+  const tb=document.getElementById('signal-tb');if(!tb)return;tb.innerHTML='';
   S.stocks.forEach((s,i)=>{
+    if(s.qty===0)return;
     const _pl=PLAN_LEVELS[s.name];const stop=_pl?_pl[0]:s.peak*0.85,t1=_pl?_pl[1]:s.peak*1.05,t2=_pl?_pl[2]:s.peak*1.10;
     const toStop=(s.cur-stop)/s.cur*100,toT1=(t1-s.cur)/s.cur*100,sg=comboSig(s,S.tech[i]);
     const tr=document.createElement('tr');tr.className=catCls[s.cat]||'';
@@ -945,47 +930,18 @@ function renderSignal(){
       <td style="text-align:center"><span class="badge ${sg.cls}">${sg.label}</span></td>`;
     tb.appendChild(tr);
   });
-
-  // ===== 종합 브리핑 (매매 신호 x 기술적 지표) =====
-  (function(){
-    const mae=s=>s.cur<=s.peak*0.85?'cut':s.cur>=s.peak*1.05?'sell':s.cur<=s.peak*0.95?'add':'hold';
-    const jong=(s,t)=>(!(t&&t.vwap>0&&t.rsi>0&&t.ma5>0&&t.ma20>0))?'na':(s.cur>t.vwap&&t.ma5>t.ma20&&t.rsi<70)?'good':(s.cur<t.vwap&&t.ma5<t.ma20&&t.rsi>30)?'bad':'neu';
-    const G={cut:[],sell:[],ag:[],an:[],ab:[],hg:[],hb:[],hn:[]};
-    S.stocks.forEach((s,i)=>{const m=mae(s),j=jong(s,S.tech[i]);
-      if(m==='cut')G.cut.push(s.name);
-      else if(m==='sell')G.sell.push(s.name);
-      else if(m==='add'){(j==='good'?G.ag:j==='bad'?G.ab:G.an).push(s.name);}
-      else{(j==='good'?G.hg:j==='bad'?G.hb:G.hn).push(s.name);}});
-    const ln=(e,l,a)=>a.length?'<div style="margin:3px 0">'+e+' <b>'+l+'</b>: '+a.join(', ')+'</div>':'';
-    let h='<div style="font-weight:600;margin-bottom:8px">📋 종합 브리핑 <span style="font-weight:400;opacity:.7;font-size:12px">(매매 신호 × 기술적 지표)</span></div>';
-    h+='<div style="margin:3px 0">\uD83D\uDD34 <b>손절 검토</b>: '+(G.cut.length?G.cut.join(', '):'없음')+'</div>';
-    h+='<div style="margin:3px 0">\uD83D\uDFE2 <b>매도·익절 검토</b>: '+(G.sell.length?G.sell.join(', '):'없음')+'</div>';
-    h+=ln('\uD83D\uDD35','분할매수 우선 (눌림 + 기술 우호)',G.ag);
-    h+=ln('\u26AA','분할매수 고려 (흐름 중립)',G.an);
-    h+=ln('\uD83D\uDFE1','분할매수하되 주의 (눌림이나 하락 흐름 — 소액·관망)',G.ab);
-    h+=ln('\uD83D\uDFE9','보유 — 흐름 양호',G.hg);
-    h+=ln('\uD83D\uDFE7','보유 — 흐름 주의',G.hb);
-    h+=ln('\u26AB','보유 — 일반',G.hn);
-    h+='<div style="margin-top:8px;opacity:.65;font-size:11px">※ 매매 신호(고점 대비)와 종합 신호(VWAP·RSI·이평선)를 합친 자동 요약입니다. 참고용이며 투자 조언이 아닙니다.</div>';
-    let bx=document.getElementById('signal-briefing');
-    if(!bx){bx=document.createElement('div');bx.id='signal-briefing';bx.className='alert a-info';bx.style.cssText='margin-top:16px;line-height:1.7;text-align:left';document.getElementById('panel-signal').appendChild(bx);}
-    bx.innerHTML=h;
-  })();
-
-  // ===== 익절 검토 레벨 (매수가 기준) =====
   (function(){
     let h='<div style="font-weight:600;margin:14px 0 6px">💰 익절 검토 레벨 <span style="font-weight:400;opacity:.7;font-size:12px">(매수가 기준 · 도달 시 ✓)</span></div>';
     h+='<div class="tbl-wrap"><table><thead><tr><th>종목</th><th style="text-align:right">현재가</th><th style="text-align:right">수익률</th><th style="text-align:right">+50%</th><th style="text-align:right">+75%</th><th style="text-align:right">+100%</th></tr></thead><tbody>';
     S.stocks.forEach(s=>{
+      if(s.qty===0)return;
       const pct=s.buy?(s.cur/s.buy-1)*100:0;
       const cell=p=>{const v=s.buy*p, hit=s.cur>=v; return '<td style="text-align:right;font-family:var(--mono)'+(hit?';color:var(--green)':'')+'">₩'+W(Math.round(v))+(hit?' ✓':'')+'</td>';};
       h+='<tr class="'+(catCls[s.cat]||'')+'"><td><strong>'+s.name+'</strong></td><td style="text-align:right;font-family:var(--mono)">₩'+W(Math.round(s.cur))+'</td><td style="text-align:right;font-family:var(--mono)" class="'+(pct>=0?'green':'red')+'">'+P(pct)+'</td>'+cell(1.5)+cell(1.75)+cell(2.0)+'</tr>';
     });
     h+='</tbody></table></div>';
-    h+='<div style="margin-top:6px;opacity:.7;font-size:11px">※ 매수 평단 대비 +50/75/100% 절대가입니다. 한 번에 전량보다 <b>레벨마다 일부씩 단계적 익절</b>을 권장하며, 도달한 레벨은 ✓ 로 표시됩니다. 위 손절/목표가 표의 1·2차목표(고점+5%/+10%)와 <b>추세 이탈(신고가 \u221210% 또는 MA20 이탈)</b>도 함께 보세요. 참고용이며 투자 조언이 아닙니다.</div>';
-    let bx=document.getElementById('profit-levels');
-    if(!bx){bx=document.createElement('div');bx.id='profit-levels';document.getElementById('panel-signal').appendChild(bx);}
-    bx.innerHTML=h;
+    h+='<div style="margin-top:6px;opacity:.7;font-size:11px">※ 매수 평단 대비 +50/75/100% 절대가. 레벨마다 일부씩 단계적 익절 권장, 도달 시 ✓. 참고용이며 투자 조언이 아닙니다.</div>';
+    let bx=document.getElementById('profit-levels');if(bx)bx.innerHTML=h;
   })();
 }
 
