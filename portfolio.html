@@ -248,6 +248,7 @@ select option{background:var(--bg2)}
 
 <!-- 대시보드 -->
 <div class="panel active" id="panel-dashboard">
+  <div id="watch-alert"></div>
   <div class="metric-row" id="metrics"></div>
   <p class="sec">보유 종목</p>
   <div class="tbl-wrap">
@@ -1111,6 +1112,34 @@ function renderTechReport(){
     +'<div style="font-size:11px;color:var(--muted);margin-top:8px">※ 지표 기반 자동 정리이며 투자 조언이 아닙니다. 매매는 규칙(지정가·관망)과 본인 판단에 따르세요.</div></div>';
 }
 
+const WATCH_CFG={name:'HD현대중공업',dip:430000,note:'1차 진입은 7/22 SK 실적 이후 (관망 규칙)'};
+function renderWatch(){
+  const el=document.getElementById('watch-alert');if(!el)return;
+  const i=S.stocks.findIndex(s=>s.name===WATCH_CFG.name);
+  if(i<0){el.innerHTML='';return;}
+  const s=S.stocks[i],t=(S.tech&&S.tech[i])||{};
+  const cur=+s.cur||0,ma5=+t.ma5||0,ma20=+t.ma20||0,vr=+t.volratio||0,vwap=+t.vwap||0,rsi=+t.rsi||0,ma50=+t.ma50||0;
+  const golden=ma5>0&&ma20>0&&ma5>ma20;
+  const inflow=vr>=1.3&&vwap>0&&cur>vwap;
+  const dip=cur>0&&cur<=WATCH_CFG.dip;
+  const hits=[];
+  if(golden)hits.push('<b>이평선 골든 전환</b> — 추세가 돌아섰습니다 (1차 진입 조건)');
+  if(inflow)hits.push('<b>거래량 급증 + VWAP 상회</b> — 매수세 유입');
+  if(dip)hits.push('<b>₩'+W(WATCH_CFG.dip)+' 이하</b> — 2차 분할 가격대 도달');
+  const on=hits.length>0;
+  const dis=ma50>0?(cur/ma50*100).toFixed(0):'-';
+  let h='<div class="alert '+(on?'a-good':'a-neu')+'" style="margin-bottom:14px;line-height:1.6;text-align:left">';
+  h+='<div style="font-weight:700">'+(on?'🟢 감시 신호 발생':'⏳ 감시 중')+' — '+s.name
+    +' <span style="font-family:var(--mono);font-weight:400">₩'+W(Math.round(cur))+'</span></div>';
+  if(on){h+='<div style="margin-top:5px">'+hits.map(x=>'· '+x).join('<br>')+'</div>';}
+  else{h+='<div style="margin-top:4px;font-size:12px;opacity:.85">조건 미충족 — 관망 유지</div>';}
+  h+='<div style="margin-top:6px;font-size:11px;opacity:.75">이평선 '+(golden?'골든':'데드')
+    +' · 거래량 '+(vr?vr.toFixed(1)+'배':'-')+' · VWAP '+(vwap?(cur>vwap?'상회':'하회'):'-')
+    +' · RSI '+(rsi?rsi.toFixed(0):'-')+' · 이격도 '+dis+'</div>';
+  h+='<div style="margin-top:5px;font-size:11px;opacity:.6">※ '+WATCH_CFG.note+'. 참고용이며 투자 조언이 아닙니다.</div></div>';
+  el.innerHTML=h;
+}
+
 function renderPlan(){
   const el=document.getElementById('plan-tb'); if(!el)return;
   const TG=[['삼성전자',28],['SK하이닉스',22],['KODEX200',22],['HD현대중공업',8],['현대차',6],['현금',14]];
@@ -1130,7 +1159,7 @@ function renderPlan(){
 }
 
 function renderAll(){
-  renderDash();renderBuy();renderSignal();renderTech();renderTechReport();renderLog();renderPlan();
+  renderDash();renderBuy();renderSignal();renderTech();renderTechReport();renderLog();renderPlan();renderWatch();
   if(S.ts)document.getElementById('ts-label').textContent='저장: '+S.ts;
 }
 
