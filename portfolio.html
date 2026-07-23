@@ -396,7 +396,18 @@ select option{background:var(--bg2)}
     <tr><td><strong>삼성전자</strong></td><td style="text-align:right;font-family:var(--mono)">37%→28%</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">₩400,000</td></tr>
   </tbody></table></div>
   <div style="margin-top:8px;line-height:1.7;font-size:13px">→ 트림 대금은 <b>현금(예수금)으로 보존</b>(재투자 보류). 현금 목표 <b>14%</b>.</div>
-  <div style="margin-top:10px;opacity:.7;font-size:11px">※ 익절가 도달 시 분할(sell into strength), 시장가 금지. 손절선: SK 1,850,000 · 삼성 265,000 · <b>현대차 400,000 경계 발령 → 390,000 종가 이탈 시 전량 정리</b>(기계적 매도 아님, 종가·거래량·외국인수급 확인 후 판단) · KODEX 117,000 · <b>HD현대 380,000</b>(아이디어 훼손 확인선). 유가·FOMC·7/29 SK 정식실적 등 시황 변화 시 조정.</div>
+  <div style="margin-top:10px;opacity:.7;font-size:11px">※ 익절가 도달 시 분할(sell into strength), 시장가 금지. 가격 손절선: <b>현대차 400,000 경계 발령 → 390,000 종가 이탈 시 전량 정리</b>(기계적 매도 아님, 종가·거래량·외국인수급 확인 후 판단) · KODEX 117,000 · <b>HD현대 380,000</b>(아이디어 훼손 확인선). <b>SK하이닉스·삼성전자는 가격 손절선 폐지(2026-07-24)</b> — 아래 체크리스트로 대체. 유가·FOMC·7/29 SK 정식실적 등 시황 변화 시 조정.</div>
+  <div class="divider"></div>
+  <p class="sec">투자 아이디어 훼손 체크리스트 — SK하이닉스·삼성전자 <span class="tag">가격 손절선 대체 · 2026-07-24</span></p>
+  <div class="card" style="font-size:13px;line-height:1.9">
+    <div style="opacity:.8;margin-bottom:8px;font-size:12px">점검 시점: 분기 실적 발표 시 + 아래 이벤트 인지 시. <b>가격 하락 자체는 매도 사유가 아님</b> — 보유 논리(반도체 슈퍼사이클·경쟁력)의 훼손 여부만 점검.</div>
+    ☐ <b>실적 가이던스 하향</b> — HBM/메모리 수요 둔화가 회사 전망에 반영되기 시작<br>
+    ☐ <b>경쟁 구도 악화</b> — HBM 점유율 하락, 수율 문제, 주요 고객 이탈 등 경쟁력 약화 신호<br>
+    ☐ <b>업황 사이클 전환</b> — D램 고정거래가격 하락 전환, 업계 재고 급증<br>
+    ☐ <b>구조적 어닝 쇼크</b> — 컨센서스 큰 폭 하회가 일회성이 아닌 구조적 원인일 때<br>
+    ☐ <b>거시 환경 훼손</b> — 환율·금리·수출 규제 등이 반도체 채산성을 구조적으로 악화<br>
+    <div style="margin-top:8px;font-size:12px;opacity:.8">→ <b>2개 이상 해당 시</b> 보유 논리 재검토 (claude.ai 상담 → 핸드오프 → 반영). 항목은 재검토 때마다 수정 가능. 참고용이며 투자 조언이 아닙니다.</div>
+  </div>
   <div class="divider"></div>
   <p class="sec">손절 / 목표가 (계획 가격선)</p>
   <div class="tbl-wrap"><table><thead><tr>
@@ -891,7 +902,8 @@ function applyJSON(){
   document.getElementById('json-input').value='';
 }
 
-const PLAN_LEVELS={'SK하이닉스':[1850000,3065000,3500000],'삼성전자':[265000,400000,500000],'현대차':[400000,580000,660000],'KODEX200':[117000,150000,160000],'HD현대중공업':[380000,630000,810000]};
+// 손절선 null = 가격 손절선 폐지 (투자 아이디어 체크리스트로 대체, 2026-07-24 핸드오프)
+const PLAN_LEVELS={'SK하이닉스':[null,3065000,3500000],'삼성전자':[null,400000,500000],'현대차':[400000,580000,660000],'KODEX200':[117000,150000,160000],'HD현대중공업':[380000,630000,810000]};
 
 // PLAN_LEVELS 조회 (종목명 별칭 대응: 현대자동차→현대차 등)
 function planOf(name){return PLAN_LEVELS[name]||PLAN_LEVELS[canonName(name)]||null;}
@@ -908,7 +920,7 @@ function planWarnings(){
   else if(dd===1)w.push({lv:'warn',msg:'📋 <b>내일('+PLAN_META.review+') 계획 재검토 예정</b> — '+PLAN_META.reviewNote});
   S.stocks.forEach(s=>{
     const pl=planOf(s.name);
-    if(!pl||!(s.qty>0)||!(s.cur>0))return;
+    if(!pl||!(pl[0]>0)||!(s.qty>0)||!(s.cur>0))return; // 손절선 폐지 종목(null)은 경고 제외
     const gap=(s.cur-pl[0])/pl[0]*100;
     if(gap<=0)w.push({lv:'bad',msg:'🔻 <b>'+s.name+' 손절선 이탈</b>: 현재 ₩'+W(Math.round(s.cur))+' < 계획선 ₩'+W(pl[0])+' ('+gap.toFixed(1)+'%) — 계획 규칙에 따라 판단 필요'});
     else if(gap<=2)w.push({lv:'warn',msg:'⚠️ <b>'+s.name+' 손절선 접근</b>: 계획선 ₩'+W(pl[0])+'까지 '+gap.toFixed(1)+'%'});
@@ -1213,15 +1225,16 @@ function renderSignal(){
   S.stocks.forEach((s,i)=>{
     if(s.qty===0)return;
     const _pl=planOf(s.name);const stop=_pl?_pl[0]:s.peak*0.85,t1=_pl?_pl[1]:s.peak*1.05,t2=_pl?_pl[2]:s.peak*1.10;
-    const toStop=(s.cur-stop)/s.cur*100,toT1=(t1-s.cur)/s.cur*100,sg=comboSig(s,S.tech[i]);
+    const noStop=!(stop>0); // 가격 손절선 폐지 종목
+    const toStop=noStop?0:(s.cur-stop)/s.cur*100,toT1=(t1-s.cur)/s.cur*100,sg=comboSig(s,S.tech[i]);
     const tr=document.createElement('tr');tr.className=catCls[s.cat]||'';
     tr.innerHTML=`<td><strong>${s.name}</strong></td>
       <td style="text-align:right;font-family:var(--mono)">₩${W(Math.round(s.cur))}</td>
-      <td style="text-align:right;font-family:var(--mono);color:var(--red)">₩${W(Math.round(stop))}</td>
+      <td style="text-align:right;font-family:var(--mono);${noStop?'':'color:var(--red)'}">${noStop?'<span style="opacity:.55;font-size:11px">폐지*</span>':'₩'+W(Math.round(stop))}</td>
       <td style="text-align:right;font-family:var(--mono);color:var(--green)">₩${W(Math.round(t1))}</td>
       <td style="text-align:right;font-family:var(--mono);color:var(--green)">₩${W(Math.round(t2))}</td>
-      <td style="text-align:right;font-family:var(--mono)" class="${toStop>=0?'green':'red'}">${P(toStop)}</td>
-      <td style="text-align:right;font-family:var(--mono)" class="green">+${P(Math.abs(toT1))}</td>
+      <td style="text-align:right;font-family:var(--mono)${noStop?';opacity:.55':''}" class="${noStop?'':toStop>=0?'green':'red'}">${noStop?'—':P(toStop)}</td>
+      <td style="text-align:right;font-family:var(--mono)" class="green">${P(Math.abs(toT1))}</td>
       <td style="text-align:center"><span class="badge ${sg.cls}">${sg.label}</span></td>`;
     tb.appendChild(tr);
   });
