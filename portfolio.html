@@ -135,6 +135,7 @@ select option{background:var(--bg2)}
     <span class="ts" id="ts-label"></span>
   </div>
   <div class="header-right">
+    <button class="btn btn-sm" id="rt-price-btn" onclick="refreshPrices()" style="color:#fbbf24;border-color:#fbbf24">🔄 시세</button>
     <button class="btn btn-sm" onclick="exportCSV()">CSV</button>
     <button class="btn btn-sm" onclick="go('sync',this)" style="color:#34d399;border-color:#34d399" id="sync-btn">☁️ 동기화</button>
     <button class="btn btn-sm btn-r" onclick="resetAll()">초기화</button>
@@ -428,10 +429,14 @@ function saveAll(){sv();renderAll();}
 
 // ── Google Sheets 동기화 함수 ─────────────────────────
 function gsCode(){
-return `// 포트폴리오 Apps Script 코드 — Google Sheets에 붙여넣기
+return `// 포트폴리오 Apps Script 코드 v2 — 데이터 동기화 + 실시간 시세 프록시
+// ⚠️ 기존 코드를 전체 삭제하고 이 코드로 교체한 뒤
+//    [배포 > 배포 관리 > 연필 아이콘 > 버전: 새 버전 > 배포]로 재배포하세요!
 const SHEET_NAME = '포트폴리오';
 
 function doGet(e) {
+  const action = (e && e.parameter && e.parameter.action) || '';
+  if (action === 'price') { return getPrices(e); }
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     let sheet = ss.getSheetByName(SHEET_NAME);
@@ -444,6 +449,25 @@ function doGet(e) {
     return ContentService.createTextOutput(JSON.stringify({error:err.message}))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+// 네이버 시세 프록시: ?action=price&codes=005930,000660,...
+function getPrices(e) {
+  const codes = ((e.parameter.codes)||'').split(',').filter(function(c){return c;});
+  const out = {};
+  codes.forEach(function(code){
+    try {
+      const url = 'https://polling.finance.naver.com/api/realtime/domestic/stock/' + code;
+      const resp = UrlFetchApp.fetch(url, {muteHttpExceptions:true});
+      const j = JSON.parse(resp.getContentText());
+      const d = j.datas && j.datas[0];
+      if (d && d.closePrice) {
+        out[code] = parseFloat(String(d.closePrice).replace(/,/g,''));
+      }
+    } catch(err) {}
+  });
+  return ContentService.createTextOutput(JSON.stringify(out))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
@@ -480,6 +504,103 @@ function fallbackCopy(text){
 }
 
 function getGsUrl(){return localStorage.getItem('pf_gs_url')||'';}
+
+// ── 실시간 시세 새로고침 ─────────────────────────────
+// 종목명 → 종목코드 매핑 (이름 공백 제거 후 비교)
+const STOCK_CODE_MAP={
+  'SK하이닉스':'000660','하이닉스':'000660',
+  '삼성전자':'005930',
+  '현대차':'005380','현대자동차':'005380',
+  '현대글로비스':'086280','글로비스':'086280',
+  'HD현대중공업':'329180','현대중공업':'329180',
+  'KODEX200':'069500','KODEX 200':'069500',
+  '카카오페이':'377300',
+  '한화에어로스페이스':'012450','한화에어로':'012450',
+  '삼천당제약':'000250',
+  '유진테크':'084370',
+  '디알젬':'263690',
+  'TIGER미국S&P500':'360750','TIGER 미국S&P500':'360750',
+  'TIGER미국나스닥100':'133690','TIGER 미국나스닥100':'133690'
+};
+const COIN_CODE_MAP={
+  '비트코인':'KRW-BTC','BTC':'KRW-BTC',
+  '이더리움':'KRW-ETH','ETH':'KRW-ETH',
+  '리플':'KRW-XRP','엑스알피':'KRW-XRP','XRP':'KRW-XRP'
+};
+function nameToStockCode(name){
+  const n=(name||'').replace(/\s+/g,'');
+  for(const k in STOCK_CODE_MAP){if(n===k.replace(/\s+/g,''))return STOCK_CODE_MAP[k];}
+  return null;
+}
+function nameToCoinMarket(name){
+  const n=(name||'').replace(/\s+/g,'').replace(/\(.*\)/,'');
+  for(const k in COIN_CODE_MAP){if(n.includes(k))return COIN_CODE_MAP[k];}
+  return null;
+}
+
+async function refreshPrices(){
+  const btn=document.getElementById('rt-price-btn');
+  const url=getGsUrl();
+  // 주식/코인 분류
+  const stockTargets=[],coinTargets=[],skipped=[];
+  S.stocks.forEach((s,i)=>{
+    const sc=nameToStockCode(s.name);
+    const cm=nameToCoinMarket(s.name);
+    if(sc)stockTargets.push({i,code:sc,name:s.name});
+    else if(cm)coinTargets.push({i,market:cm,name:s.name});
+    else skipped.push(s.name);
+  });
+  if(!stockTargets.length&&!coinTargets.length){
+    alert('시세 조회 가능한 종목이 없습니다.');return;
+  }
+  if(stockTargets.length&&!url){
+    alert('주식 시세는 Apps Script URL 설정이 필요합니다.\n(☁️ Google 동기화 탭에서 설정)\n코인만 갱신합니다.');
+  }
+  if(btn){btn.disabled=true;btn.textContent='⏳ 조회중';}
+  let okCnt=0,failList=[];
+  try{
+    // ① 주식: Apps Script 프록시 경유
+    if(stockTargets.length&&url){
+      try{
+        const codes=[...new Set(stockTargets.map(t=>t.code))].join(',');
+        const resp=await fetch(url+'?action=price&codes='+codes,{method:'GET'});
+        const prices=await resp.json();
+        stockTargets.forEach(t=>{
+          const p=prices[t.code];
+          if(p&&p>0){
+            S.stocks[t.i].cur=p;
+            if(p>(S.stocks[t.i].peak||0))S.stocks[t.i].peak=p;
+            okCnt++;
+          } else failList.push(t.name);
+        });
+      }catch(e){stockTargets.forEach(t=>failList.push(t.name));}
+    }
+    // ② 코인: 업비트 공개 API 직접 (CORS 허용)
+    if(coinTargets.length){
+      try{
+        const mkts=[...new Set(coinTargets.map(t=>t.market))].join(',');
+        const resp=await fetch('https://api.upbit.com/v1/ticker?markets='+mkts);
+        const arr=await resp.json();
+        const mp={};(arr||[]).forEach(a=>{mp[a.market]=a.trade_price;});
+        coinTargets.forEach(t=>{
+          const p=mp[t.market];
+          if(p&&p>0){
+            S.stocks[t.i].cur=p;
+            if(p>(S.stocks[t.i].peak||0))S.stocks[t.i].peak=p;
+            okCnt++;
+          } else failList.push(t.name);
+        });
+      }catch(e){coinTargets.forEach(t=>failList.push(t.name));}
+    }
+    sv();renderAll();
+    let msg='🔄 시세 갱신 완료: '+okCnt+'개 종목';
+    if(failList.length)msg+='\n❌ 실패: '+failList.join(', ')+'\n(Apps Script v2 재배포 여부를 확인하세요)';
+    if(skipped.length)msg+='\n⏭️ 건너뜀(수동입력 필요): '+skipped.join(', ');
+    alert(msg);
+  } finally {
+    if(btn){btn.disabled=false;btn.textContent='🔄 시세';}
+  }
+}
 
 function saveGsUrl(){
   const url=(document.getElementById('gs-url').value||'').trim();
