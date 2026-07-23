@@ -408,7 +408,7 @@ const DEF=[
   {name:'이더리움',qty:3.62244049,buy:3191797,peak:3461000,cur:3388000,cat:'coin'},
   {name:'비트코인',qty:0.04702538,buy:113990654,peak:113992065,cur:113720000,cat:'coin'},
 ];
-const SAMPLE='[{"name":"SK하이닉스","cur":1900000,"vwap":1885000,"rsi":62.4,"ma5":1870000,"ma20":1810000},{"name":"삼성전자","cur":275000,"vwap":273500,"rsi":55.1,"ma5":274000,"ma20":270000},{"name":"현대차","cur":455000,"vwap":452000,"rsi":48.7,"ma5":458000,"ma20":465000},{"name":"현대글로비스","cur":185000,"vwap":184000,"rsi":46.2,"ma5":186000,"ma20":189000},{"name":"HD현대중공업","cur":450000,"vwap":448000,"rsi":51.8,"ma5":452000,"ma20":460000},{"name":"KODEX200","cur":118500,"vwap":118000,"rsi":53.2,"ma5":118200,"ma20":117000}]';
+const SAMPLE='[{"name":"SK하이닉스","cur":1900000,"vwap":1885000,"rsi":62.4,"ma5":1870000,"ma20":1810000,"ma50":1750000,"volratio":1.8},{"name":"삼성전자","cur":275000,"vwap":273500,"rsi":55.1,"ma5":274000,"ma20":270000,"ma50":262000,"volratio":1.1},{"name":"현대차","cur":455000,"vwap":452000,"rsi":48.7,"ma5":458000,"ma20":465000,"ma50":470000,"volratio":0.9},{"name":"현대글로비스","cur":185000,"vwap":184000,"rsi":46.2,"ma5":186000,"ma20":189000,"ma50":191000,"volratio":0.8},{"name":"HD현대중공업","cur":450000,"vwap":448000,"rsi":51.8,"ma5":452000,"ma20":460000,"ma50":455000,"volratio":1.4},{"name":"KODEX200","cur":118500,"vwap":118000,"rsi":53.2,"ma5":118200,"ma20":117000,"ma50":115500,"volratio":1.0}]';
 
 function ld(){
   try{return{
@@ -747,6 +747,18 @@ function loadSample(){
   document.getElementById('json-status').className='json-st st-ready';
 }
 
+// tech_indicators.py 종목명 ↔ 앱 종목명 표준화 (별칭 → 대표명)
+const NAME_CANON={'현대자동차':'현대차','글로비스':'현대글로비스','현대중공업':'HD현대중공업'};
+const canonName=n=>NAME_CANON[n]||n;
+// S.tech를 S.stocks와 같은 순서·구성으로 정렬 (누락 항목은 빈 값으로 생성)
+function alignTech(){
+  const old=S.tech||[];
+  S.tech=S.stocks.map(s=>{
+    const t=old.find(t=>t&&canonName(t.name)===canonName(s.name));
+    return t?{...t,name:s.name}:{name:s.name,vwap:0,rsi:0,ma5:0,ma20:0};
+  });
+}
+
 function applyJSON(){
   const raw=document.getElementById('json-input').value.trim();
   const el=document.getElementById('json-status');
@@ -754,22 +766,21 @@ function applyJSON(){
   let parsed;
   try{parsed=JSON.parse(raw);}catch(e){el.textContent='형식 오류: '+e.message;el.className='json-st st-err';return;}
   if(!Array.isArray(parsed)){el.textContent='배열 형식이 아닙니다';el.className='json-st st-err';return;}
-  // tech_indicators.py 종목명 ↔ 앱 종목명 별칭 (양방향)
-  const ALIAS={'현대차':'현대자동차','현대자동차':'현대차','현대중공업':'HD현대중공업','글로비스':'현대글로비스'};
-  const findIdx=(arr,n)=>{let i=arr.findIndex(x=>x.name===n);if(i<0&&ALIAS[n])i=arr.findIndex(x=>x.name===ALIAS[n]);return i;};
-  let u=0,p=0;
+  alignTech();
+  let u=0,p=0;const miss=[];
   parsed.forEach(item=>{
     if(!item.name)return;
-    const ti=findIdx(S.tech,item.name);
-    const si=findIdx(S.stocks,item.name);
-    if(ti>=0){S.tech[ti]={name:S.tech[ti].name,vwap:item.vwap||0,rsi:item.rsi||0,ma5:item.ma5||0,ma20:item.ma20||0};u++;}
-    if(si>=0&&item.cur>0){if(item.cur>S.stocks[si].peak)S.stocks[si].peak=item.cur;S.stocks[si].cur=item.cur;p++;}
+    const i=S.stocks.findIndex(s=>canonName(s.name)===canonName(item.name));
+    if(i<0){miss.push(item.name);return;}
+    S.tech[i]={name:S.stocks[i].name,vwap:item.vwap||0,rsi:item.rsi||0,ma5:item.ma5||0,ma20:item.ma20||0,ma50:item.ma50||0,volratio:item.volratio||0};u++;
+    if(item.cur>0){if(item.cur>S.stocks[i].peak)S.stocks[i].peak=item.cur;S.stocks[i].cur=item.cur;p++;}
   });
   const now=new Date().toLocaleString('ko-KR');
   S.ah.unshift({ts:now,u,p,items:parsed.map(i=>i.name)});
   if(S.ah.length>10)S.ah=S.ah.slice(0,10);
   sv();renderAll();
-  el.textContent=`완료: ${u}개 지표 + ${p}개 현재가`;el.className='json-st st-ok';
+  el.textContent=`완료: ${u}개 지표 + ${p}개 현재가`+(miss.length?' · 미매칭: '+miss.join(', '):'');
+  el.className=miss.length?'json-st st-err':'json-st st-ok';
   document.getElementById('json-input').value='';
 }
 
@@ -1303,6 +1314,7 @@ function renderPlan(){
 }
 
 function renderAll(){
+  alignTech();
   renderDash();renderBuy();renderSignal();renderTech();renderTechReport();renderLog();renderPlan();renderWatch();
   if(S.ts)document.getElementById('ts-label').textContent='저장: '+S.ts;
 }
