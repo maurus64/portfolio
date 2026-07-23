@@ -83,6 +83,7 @@ select option{background:var(--bg2)}
 /* 알림 */
 .alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:8px;border-left:3px solid}
 .a-warn{background:#1c1200;color:var(--gold);border-color:var(--gold)}
+.a-bad{background:#450a0a;color:var(--red);border-color:var(--red)}
 .a-good{background:#022c22;color:var(--green);border-color:var(--green)}
 .a-info{background:#0a1628;color:var(--accent);border-color:var(--accent)}
 .a-neu{background:var(--bg2);color:var(--muted);border-color:var(--border)}
@@ -250,6 +251,7 @@ select option{background:var(--bg2)}
 
 <!-- 대시보드 -->
 <div class="panel active" id="panel-dashboard">
+  <div id="plan-warn-dash"></div>
   <div id="watch-alert"></div>
   <div class="metric-row" id="metrics"></div>
   <p class="sec">보유 종목</p>
@@ -364,14 +366,21 @@ select option{background:var(--bg2)}
 </div>
 
 <div class="panel" id="panel-plan">
-  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 — 2026-07-15 재검토 (방어적 관망). 참고용이며 투자 조언이 아닙니다.</div>
+  <div id="plan-warn-plan"></div>
+  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-07-23 갱신, 방어적 관망) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.</div>
+  <details class="card" style="margin-bottom:12px;font-size:12.5px;line-height:1.6"><summary style="cursor:pointer;font-weight:700;color:var(--accent);list-style:none">📌 재검토 운용 룰 (셋 중 하나라도 발생 시 재검토)</summary><div style="margin-top:10px">
+    ① <b>정기</b>: 월 1회 (매월 첫 주말)<br>
+    ② <b>이벤트</b>: 보유종목 실적 발표 · FOMC · 손절선 ±2% 접근 (하단 자동 경고 연동)<br>
+    ③ <b>비중</b>: 목표 비중 대비 ±5%p 이탈 종목 발생<br>
+    <span style="opacity:.7">절차: claude.ai에서 시나리오 상담 → 결정 → Claude Code에서 이 탭 수정+커밋 (git 이력 = 계획 변경 일지)</span>
+  </div></details>
   <p class="sec">목표 비중 vs 현재</p>
   <div class="tbl-wrap"><table><thead><tr><th>종목</th><th style="text-align:right">현재</th><th style="text-align:right">목표</th><th style="text-align:center">조정</th></tr></thead><tbody id="plan-tb"></tbody></table></div>
   <div class="divider"></div>
         <p class="sec">실행 순서</p>
   <div style="line-height:1.7;font-size:13px">
     <b>1단계 — 보유 종목: 관망·방어</b><br>
-    · 기존 종목 신규 매수 <b>보류</b>. 7/22 SK 실적 + 7/28 FOMC 통과까지 관망.<br>
+    · 기존 종목 신규 매수 <b>보류</b>. 7/29(수) SK 정식실적(잠정 7/22 서프라이즈 확인됨) + 7/28 FOMC 통과까지 관망.<br>
     · 매파 연준 + 유가 급등(호르무즈) 국면 → 지정가 원칙 · 폭락일 공황매도 금지.<br><br>
     <b>2단계 — HD현대중공업 분할 진입 (조선·분산)</b>
   </div>
@@ -387,7 +396,7 @@ select option{background:var(--bg2)}
     <tr><td><strong>삼성전자</strong></td><td style="text-align:right;font-family:var(--mono)">37%→28%</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">₩400,000</td></tr>
   </tbody></table></div>
   <div style="margin-top:8px;line-height:1.7;font-size:13px">→ 트림 대금은 <b>현금(예수금)으로 보존</b>(재투자 보류). 현금 목표 <b>14%</b>.</div>
-  <div style="margin-top:10px;opacity:.7;font-size:11px">※ 익절가 도달 시 분할(sell into strength), 시장가 금지. 손절선: SK 1,850,000 · 삼성 265,000 · 현대차 400,000 · KODEX 117,000 · <b>HD현대 380,000</b>(아이디어 훼손 확인선). 유가·FOMC·7/22 SK 실적 등 시황 변화 시 조정.</div>
+  <div style="margin-top:10px;opacity:.7;font-size:11px">※ 익절가 도달 시 분할(sell into strength), 시장가 금지. 손절선: SK 1,850,000 · 삼성 265,000 · <b>현대차 400,000 경계 발령 → 390,000 종가 이탈 시 전량 정리</b>(기계적 매도 아님, 종가·거래량·외국인수급 확인 후 판단) · KODEX 117,000 · <b>HD현대 380,000</b>(아이디어 훼손 확인선). 유가·FOMC·7/29 SK 정식실적 등 시황 변화 시 조정.</div>
   <div class="divider"></div>
   <p class="sec">손절 / 목표가 (계획 가격선)</p>
   <div class="tbl-wrap"><table><thead><tr>
@@ -884,8 +893,40 @@ function applyJSON(){
 
 const PLAN_LEVELS={'SK하이닉스':[1850000,3065000,3500000],'삼성전자':[265000,400000,500000],'현대차':[400000,580000,660000],'KODEX200':[117000,150000,160000],'HD현대중공업':[380000,630000,810000]};
 
+// PLAN_LEVELS 조회 (종목명 별칭 대응: 현대자동차→현대차 등)
+function planOf(name){return PLAN_LEVELS[name]||PLAN_LEVELS[canonName(name)]||null;}
+
+// ── 계획 재검토·손절선 자동 경고 ─────────────────────
+const PLAN_META={review:'2026-07-30',reviewNote:'7/29 SK 정식실적 · 7/28 FOMC 통과 후'};
+function planWarnings(){
+  const w=[];
+  const today=new Date();today.setHours(0,0,0,0);
+  const rv=new Date(PLAN_META.review+'T00:00:00');
+  const dd=Math.round((rv-today)/86400000);
+  if(dd<0)w.push({lv:'bad',msg:'⚠️ <b>계획 재검토 기한 '+(-dd)+'일 경과</b> ('+PLAN_META.review+') — 계획 탭 재검토가 필요합니다'});
+  else if(dd===0)w.push({lv:'warn',msg:'📋 <b>오늘은 계획 재검토일</b>입니다 — '+PLAN_META.reviewNote});
+  else if(dd===1)w.push({lv:'warn',msg:'📋 <b>내일('+PLAN_META.review+') 계획 재검토 예정</b> — '+PLAN_META.reviewNote});
+  S.stocks.forEach(s=>{
+    const pl=planOf(s.name);
+    if(!pl||!(s.qty>0)||!(s.cur>0))return;
+    const gap=(s.cur-pl[0])/pl[0]*100;
+    if(gap<=0)w.push({lv:'bad',msg:'🔻 <b>'+s.name+' 손절선 이탈</b>: 현재 ₩'+W(Math.round(s.cur))+' < 계획선 ₩'+W(pl[0])+' ('+gap.toFixed(1)+'%) — 계획 규칙에 따라 판단 필요'});
+    else if(gap<=2)w.push({lv:'warn',msg:'⚠️ <b>'+s.name+' 손절선 접근</b>: 계획선 ₩'+W(pl[0])+'까지 '+gap.toFixed(1)+'%'});
+  });
+  return w;
+}
+function renderPlanWarnings(){
+  const ws=planWarnings();
+  const html=ws.map(x=>'<div class="alert '+(x.lv==='bad'?'a-bad':'a-warn')+'" style="margin-bottom:8px">'+x.msg+'</div>').join('');
+  ['plan-warn-dash','plan-warn-plan'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.innerHTML=html;
+  });
+  const lb=document.getElementById('plan-review-label');
+  if(lb)lb.textContent=PLAN_META.review+' ('+PLAN_META.reviewNote+')';
+}
+
 function comboSig(s,t){
-  const _pl=PLAN_LEVELS[s.name];const m=s.cur<=(_pl?_pl[0]:s.peak*0.85)?'cut':s.cur>=(_pl?_pl[1]:s.peak*1.05)?'sell':s.cur<=s.peak*0.95?'add':'hold';
+  const _pl=planOf(s.name);const m=s.cur<=(_pl?_pl[0]:s.peak*0.85)?'cut':s.cur>=(_pl?_pl[1]:s.peak*1.05)?'sell':s.cur<=s.peak*0.95?'add':'hold';
   const j=(!(t&&t.vwap>0&&t.rsi>0&&t.ma5>0&&t.ma20>0))?'na':(s.cur>t.vwap&&t.ma5>t.ma20&&t.rsi<70)?'good':(s.cur<t.vwap&&t.ma5<t.ma20&&t.rsi>30)?'bad':'neu';
   let label,cls;
   if(m==='cut'){label='손절 검토';cls='b-cut';}
@@ -1159,7 +1200,7 @@ function delHist(i){if(confirm('삭제하시겠습니까?')){S.hist.splice(i,1);
 
 function renderSignal(){
   function comboSig(s,t){
-    const _pl=PLAN_LEVELS[s.name];const m=s.cur<=(_pl?_pl[0]:s.peak*0.85)?'cut':s.cur>=(_pl?_pl[1]:s.peak*1.05)?'sell':s.cur<=s.peak*0.95?'add':'hold';
+    const _pl=planOf(s.name);const m=s.cur<=(_pl?_pl[0]:s.peak*0.85)?'cut':s.cur>=(_pl?_pl[1]:s.peak*1.05)?'sell':s.cur<=s.peak*0.95?'add':'hold';
     const j=(!(t&&t.vwap>0&&t.rsi>0&&t.ma5>0&&t.ma20>0))?'na':(s.cur>t.vwap&&t.ma5>t.ma20&&t.rsi<70)?'good':(s.cur<t.vwap&&t.ma5<t.ma20&&t.rsi>30)?'bad':'neu';
     let label,cls;
     if(m==='cut'){label='손절 검토';cls='b-cut';}
@@ -1171,7 +1212,7 @@ function renderSignal(){
   const tb=document.getElementById('signal-tb');if(!tb)return;tb.innerHTML='';
   S.stocks.forEach((s,i)=>{
     if(s.qty===0)return;
-    const _pl=PLAN_LEVELS[s.name];const stop=_pl?_pl[0]:s.peak*0.85,t1=_pl?_pl[1]:s.peak*1.05,t2=_pl?_pl[2]:s.peak*1.10;
+    const _pl=planOf(s.name);const stop=_pl?_pl[0]:s.peak*0.85,t1=_pl?_pl[1]:s.peak*1.05,t2=_pl?_pl[2]:s.peak*1.10;
     const toStop=(s.cur-stop)/s.cur*100,toT1=(t1-s.cur)/s.cur*100,sg=comboSig(s,S.tech[i]);
     const tr=document.createElement('tr');tr.className=catCls[s.cat]||'';
     tr.innerHTML=`<td><strong>${s.name}</strong></td>
@@ -1365,7 +1406,7 @@ function renderTechReport(){
     +'<div style="font-size:11px;color:var(--muted);margin-top:8px">※ 지표 기반 자동 정리이며 투자 조언이 아닙니다. 매매는 규칙(지정가·관망)과 본인 판단에 따르세요.</div></div>';
 }
 
-const WATCH_CFG={name:'HD현대중공업',dip:430000,note:'1차 진입은 7/22 SK 실적 이후 (관망 규칙)'};
+const WATCH_CFG={name:'HD현대중공업',dip:430000,note:'1차 4주 완료 — 2차 5주는 현금 확보 전 보류 (계획 탭 참조)'};
 function renderWatch(){
   const el=document.getElementById('watch-alert');if(!el)return;
   const i=S.stocks.findIndex(s=>s.name===WATCH_CFG.name);
@@ -1400,7 +1441,7 @@ function renderPlan(){
   const tot=(S.stocks.reduce((a,s)=>a+s.qty*s.cur,0)+cashDep)||1;
   let html='';
   TG.forEach(([nm,tw])=>{
-    const s=S.stocks.find(x=>x.name===nm);
+    const s=S.stocks.find(x=>canonName(x.name)===canonName(nm));
     const val=nm==='현금'?cashDep:(s?s.qty*s.cur:0);
     let curTxt,dir;
     if(nm!=='현금'&&!s){curTxt='미보유';dir='<span style="color:var(--accent)">▲ 신규</span>';}
@@ -1413,7 +1454,7 @@ function renderPlan(){
 
 function renderAll(){
   alignTech();
-  renderDash();renderBuy();renderSignal();renderTech();renderTechReport();renderLog();renderPlan();renderWatch();
+  renderDash();renderBuy();renderSignal();renderTech();renderTechReport();renderLog();renderPlan();renderWatch();renderPlanWarnings();
   if(S.ts)document.getElementById('ts-label').textContent='저장: '+S.ts;
 }
 
