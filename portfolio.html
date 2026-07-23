@@ -136,6 +136,7 @@ select option{background:var(--bg2)}
   </div>
   <div class="header-right">
     <button class="btn btn-sm" id="rt-price-btn" onclick="refreshPrices()" style="color:#fbbf24;border-color:#fbbf24">🔄 시세</button>
+    <button class="btn btn-sm" id="rt-ind-btn" onclick="refreshIndicators()" style="color:#a78bfa;border-color:#a78bfa">📊 지표</button>
     <button class="btn btn-sm" onclick="exportCSV()">CSV</button>
     <button class="btn btn-sm" onclick="go('sync',this)" style="color:#34d399;border-color:#34d399" id="sync-btn">☁️ 동기화</button>
     <button class="btn btn-sm btn-r" onclick="resetAll()">초기화</button>
@@ -320,7 +321,7 @@ select option{background:var(--bg2)}
   <div class="divider"></div>
   <p class="sec">자동 지표 입력 (JSON)</p>
   <div class="card">
-    <div class="alert a-purple" style="margin-bottom:12px">tech_indicators.py 실행 후 생성된 indicators_output.json 내용을 붙여넣으면 지표·현재가가 자동 반영됩니다.</div>
+    <div class="alert a-purple" style="margin-bottom:12px">평소에는 상단 <b>[📊 지표]</b> 버튼 한 번이면 자동 계산됩니다. 이 입력창은 예비용 — tech_indicators.py 실행 결과(indicators_output.json)를 붙여넣어도 반영됩니다.</div>
     <div class="ig" style="margin-bottom:10px">
       <label>Python 출력 JSON</label>
       <textarea id="json-input" rows="8" placeholder='[{"name":"SK하이닉스","cur":1306000,"vwap":1290000,"rsi":58.3,"ma5":1298000,"ma20":1275000},...]'></textarea>
@@ -442,7 +443,7 @@ function saveAll(){sv();renderAll();}
 
 // ── Google Sheets 동기화 함수 ─────────────────────────
 function gsCode(){
-return `// 포트폴리오 Apps Script 코드 v2 — 데이터 동기화 + 실시간 시세 프록시
+return `// 포트폴리오 Apps Script 코드 v3 — 데이터 동기화 + 시세 프록시 + 지표 자동 수신
 // ⚠️ 기존 코드를 전체 삭제하고 이 코드로 교체한 뒤
 //    [배포 > 배포 관리 > 연필 아이콘 > 버전: 새 버전 > 배포]로 재배포하세요!
 const SHEET_NAME = '포트폴리오';
@@ -450,6 +451,7 @@ const SHEET_NAME = '포트폴리오';
 function doGet(e) {
   const action = (e && e.parameter && e.parameter.action) || '';
   if (action === 'price') { return getPrices(e); }
+  if (action === 'indicators') { return getIndicators(e); }
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     let sheet = ss.getSheetByName(SHEET_NAME);
@@ -477,6 +479,60 @@ function getPrices(e) {
       if (d && d.closePrice) {
         out[code] = parseFloat(String(d.closePrice).replace(/,/g,''));
       }
+    } catch(err) {}
+  });
+  return ContentService.createTextOutput(JSON.stringify(out))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// 기술적 지표 계산: ?action=indicators&codes=005930,000660,...
+// 네이버 일봉 80개로 RSI(14)·MA5/20/50·거래량비 계산, 실시간 API로 현재가·VWAP
+function getIndicators(e) {
+  const codes = ((e.parameter.codes)||'').split(',').filter(function(c){return c;});
+  const out = [];
+  codes.forEach(function(code){
+    try {
+      const url = 'https://fchart.stock.naver.com/sise.nhn?symbol='+code+'&timeframe=day&count=80&requestType=0';
+      const xml = UrlFetchApp.fetch(url,{muteHttpExceptions:true}).getContentText();
+      const rows = [];
+      const re = /data="([^"]+)"/g; var m;
+      while ((m = re.exec(xml)) !== null) {
+        const p = m[1].split('|'); // 날짜|시가|고가|저가|종가|거래량
+        const c = parseFloat(p[4]), v = parseFloat(p[5]);
+        if (c > 0) rows.push({close:c, vol:v||0});
+      }
+      if (rows.length < 30) return; // 데이터 부족 시 건너뜀
+      const closes = rows.map(function(r){return r.close;});
+      const n = closes.length;
+      const ma = function(k){ if(n<k) return 0; var s=0; for(var i=n-k;i<n;i++)s+=closes[i]; return s/k; };
+      // RSI(14) — Wilder 방식
+      var gain=0, loss=0;
+      for (var i=1;i<=14;i++){ var d=closes[i]-closes[i-1]; if(d>0)gain+=d; else loss-=d; }
+      var ag=gain/14, al=loss/14;
+      for (var i=15;i<n;i++){ var d=closes[i]-closes[i-1]; ag=(ag*13+(d>0?d:0))/14; al=(al*13+(d<0?-d:0))/14; }
+      const rsi = al===0?100:100-100/(1+ag/al);
+      // 거래량비: 오늘 ÷ 직전 20일 평균
+      var vs=0; for(var i=n-21;i<n-1;i++)vs+=rows[i].vol;
+      const volratio = vs>0 ? rows[n-1].vol/(vs/20) : 0;
+      // 현재가·VWAP (당일 누적 거래대금 ÷ 누적 거래량, 단위 자동 보정)
+      var cur=closes[n-1], vwap=0;
+      try {
+        const rj = JSON.parse(UrlFetchApp.fetch('https://polling.finance.naver.com/api/realtime/domestic/stock/'+code,{muteHttpExceptions:true}).getContentText());
+        const dd = rj.datas && rj.datas[0];
+        if (dd) {
+          const cp = parseFloat(String(dd.closePriceRaw||dd.closePrice||'').replace(/,/g,''));
+          if (cp>0) cur = cp;
+          const av = parseFloat(dd.accumulatedTradingValueRaw||'0');
+          const aq = parseFloat(dd.accumulatedTradingVolumeRaw||'0');
+          if (av>0 && aq>0) {
+            var cand = av/aq; // 원 단위 거래대금 ÷ 주 = VWAP
+            if (cur>0 && cand>cur*0.5 && cand<cur*2) vwap = Math.round(cand);
+          }
+        }
+      } catch(err2) {}
+      out.push({code:code, cur:cur, vwap:vwap, rsi:Math.round(rsi*10)/10,
+        ma5:Math.round(ma(5)), ma20:Math.round(ma(20)), ma50:Math.round(ma(50)),
+        volratio:Math.round(volratio*10)/10});
     } catch(err) {}
   });
   return ContentService.createTextOutput(JSON.stringify(out))
@@ -607,11 +663,53 @@ async function refreshPrices(){
     }
     sv();renderAll();
     let msg='🔄 시세 갱신 완료: '+okCnt+'개 종목';
-    if(failList.length)msg+='\n❌ 실패: '+failList.join(', ')+'\n(Apps Script v2 재배포 여부를 확인하세요)';
+    if(failList.length)msg+='\n❌ 실패: '+failList.join(', ')+'\n(Apps Script v3 재배포 여부를 확인하세요)';
     if(skipped.length)msg+='\n⏭️ 건너뜀(수동입력 필요): '+skipped.join(', ');
     alert(msg);
   } finally {
     if(btn){btn.disabled=false;btn.textContent='🔄 시세';}
+  }
+}
+
+// ── 원클릭 지표 갱신 (Apps Script가 네이버 일봉으로 직접 계산) ──
+async function refreshIndicators(){
+  const btn=document.getElementById('rt-ind-btn');
+  const url=getGsUrl();
+  if(!url){alert('지표 갱신은 Apps Script URL 설정이 필요합니다.\n(☁️ Google 동기화 탭에서 설정)');return;}
+  const targets=[],skipped=[];
+  S.stocks.forEach((s,i)=>{
+    const sc=nameToStockCode(s.name);
+    if(sc)targets.push({i,code:sc,name:s.name});
+    else skipped.push(s.name);
+  });
+  if(!targets.length){alert('지표 조회 가능한 종목이 없습니다.');return;}
+  if(btn){btn.disabled=true;btn.textContent='⏳ 계산중';}
+  try{
+    const codes=[...new Set(targets.map(t=>t.code))].join(',');
+    const resp=await fetch(url+'?action=indicators&codes='+codes,{method:'GET'});
+    const arr=await resp.json();
+    if(!Array.isArray(arr))throw new Error((arr&&arr.error)||'응답 형식 오류');
+    alignTech();
+    const got={};arr.forEach(a=>{got[a.code]=a;});
+    let u=0,p=0;const fail=[];
+    targets.forEach(t=>{
+      const a=got[t.code];
+      if(!a){fail.push(t.name);return;}
+      S.tech[t.i]={name:S.stocks[t.i].name,vwap:a.vwap||0,rsi:a.rsi||0,ma5:a.ma5||0,ma20:a.ma20||0,ma50:a.ma50||0,volratio:a.volratio||0};u++;
+      if(a.cur>0){if(a.cur>(S.stocks[t.i].peak||0))S.stocks[t.i].peak=a.cur;S.stocks[t.i].cur=a.cur;p++;}
+    });
+    const now=new Date().toLocaleString('ko-KR');
+    S.ah.unshift({ts:now,u,p,items:targets.map(t=>t.name)});
+    if(S.ah.length>10)S.ah=S.ah.slice(0,10);
+    sv();renderAll();
+    let msg='📊 지표 갱신 완료: '+u+'개 종목';
+    if(fail.length)msg+='\n❌ 실패: '+fail.join(', ');
+    if(skipped.length)msg+='\n⏭️ 건너뜀(코인 등 미지원): '+skipped.join(', ');
+    alert(msg);
+  }catch(e){
+    alert('지표 갱신 실패: '+e.message+'\n(Apps Script v3 재배포 여부를 확인하세요)');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='📊 지표';}
   }
 }
 
