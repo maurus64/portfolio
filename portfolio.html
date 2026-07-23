@@ -367,7 +367,8 @@ select option{background:var(--bg2)}
 
 <div class="panel" id="panel-plan">
   <div id="plan-warn-plan"></div>
-  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-07-23 갱신, 방어적 관망) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.</div>
+  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-07-24 갱신, 방어적 관망) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.</div>
+  <div class="alert a-warn" style="margin-bottom:12px">✈️ <b>여행 7/25~7/31 (거래 제한)</b> — 자동주문 세팅(효력 ~8/1): <b>HD현대중공업 ₩380,000 · KODEX200 ₩117,000</b> 손절선 자동주문 / <b>현대차 ₩400,000 알림만</b> / SK하이닉스·삼성전자는 세팅 안 함(손절선 폐지). 귀국 후 8/1(늦어도 8/3) 재검토 시 해제·재설정.</div>
   <details class="card" style="margin-bottom:12px;font-size:12.5px;line-height:1.6"><summary style="cursor:pointer;font-weight:700;color:var(--accent);list-style:none">📌 재검토 운용 룰 (셋 중 하나라도 발생 시 재검토)</summary><div style="margin-top:10px">
     ① <b>정기</b>: 월 1회 (매월 첫 주말)<br>
     ② <b>이벤트</b>: 보유종목 실적 발표 · FOMC · 손절선 ±2% 접근 (하단 자동 경고 연동)<br>
@@ -381,7 +382,8 @@ select option{background:var(--bg2)}
   <div style="line-height:1.7;font-size:13px">
     <b>1단계 — 보유 종목: 관망·방어</b><br>
     · 기존 종목 신규 매수 <b>보류</b>. 7/29(수) SK 정식실적(잠정 7/22 서프라이즈 확인됨) + 7/28 FOMC 통과까지 관망.<br>
-    · 매파 연준 + 유가 급등(호르무즈) 국면 → 지정가 원칙 · 폭락일 공황매도 금지.<br><br>
+    · 매파 연준 + 유가 급등(호르무즈) 국면 → 지정가 원칙 · 폭락일 공황매도 금지.<br>
+    · <b>관전포인트</b>(7/23 급등 +4.4%, 알파벳 실적발 안도랠리 — 계획 변경 없음): 전력기기 테마 부상 · 외국인 4거래일 연속 순매수.<br><br>
     <b>2단계 — HD현대중공업 분할 진입 (조선·분산)</b>
   </div>
   <div class="tbl-wrap" style="margin-top:6px"><table><thead><tr><th>회차</th><th style="text-align:right">수량</th><th style="text-align:right">가격</th><th style="text-align:center">상태</th></tr></thead><tbody>
@@ -909,7 +911,7 @@ const PLAN_LEVELS={'SK하이닉스':[null,3065000,3500000],'삼성전자':[null,
 function planOf(name){return PLAN_LEVELS[name]||PLAN_LEVELS[canonName(name)]||null;}
 
 // ── 계획 재검토·손절선 자동 경고 ─────────────────────
-const PLAN_META={review:'2026-07-30',reviewNote:'7/29 SK 정식실적 · 7/28 FOMC 통과 후'};
+const PLAN_META={review:'2026-08-01',reviewNote:'여행(7/25~31) 귀국 후 — 늦어도 8/3 · FOMC(7/28)·SK 정식실적(7/29) 결과 반영'};
 function planWarnings(){
   const w=[];
   const today=new Date();today.setHours(0,0,0,0);
