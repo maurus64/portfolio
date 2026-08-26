@@ -367,8 +367,8 @@ select option{background:var(--bg2)}
 
 <div class="panel" id="panel-plan">
   <div id="plan-warn-plan"></div>
-  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-08-03 갱신, 손절기준 전면개편) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.</div>
-  <div class="alert a-good" style="margin-bottom:12px">🖐️ <b>전 종목 수동 모니터링 체제 (2026-08-03)</b> — 여행(7/25~31) 종료·귀국 완료, 당분간 추가 출국 없음 → 자동주문(스탑로스) 세팅 불필요. 향후 재출국 시 자동주문 필요성 재논의.</div>
+  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-08-26 갱신, v6 — 전 6종목 손절선 폐지·목표비중 전면 재설정) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.</div>
+  <div class="alert a-good" style="margin-bottom:12px">🖐️ <b>전 종목 수동 모니터링 체제 (2026-08-26 재확인)</b> — 당분간 출국 계획 없음 → 자동주문(스탑로스) 세팅 불필요. 향후 재출국 시점에 필요성 재논의.</div>
   <details class="card" style="margin-bottom:12px;font-size:12.5px;line-height:1.6"><summary style="cursor:pointer;font-weight:700;color:var(--accent);list-style:none">📌 재검토 운용 룰 (셋 중 하나라도 발생 시 재검토)</summary><div style="margin-top:10px">
     ① <b>정기</b>: 월 1회 수준<br>
     ② <b>이벤트</b>: 보유종목 실적 발표 · FOMC · 급등락 · 종목별 펀더멘털 체크리스트 항목 발생<br>
@@ -377,6 +377,7 @@ select option{background:var(--bg2)}
   </div></details>
   <p class="sec">목표 비중 vs 현재</p>
   <div class="tbl-wrap"><table><thead><tr><th>종목</th><th style="text-align:right">현재</th><th style="text-align:right">목표</th><th style="text-align:center">조정</th></tr></thead><tbody id="plan-tb"></tbody></table></div>
+  <div style="margin-top:8px;opacity:.75;font-size:11.5px">※ 2026-08-26 전면 재설정. <b>반도체 계열(삼성+SK+KODEX) 합산 64%</b> — 의도적 고집중 전략 여부는 추후 재논의 대상. 현대글로비스는 소액 위성종목에서 <b>정식 핵심 보유종목으로 격상</b>(3주→24주).</div>
   <div class="divider"></div>
         <p class="sec">실행 순서</p>
   <div style="line-height:1.7;font-size:13px">
@@ -389,18 +390,27 @@ select option{background:var(--bg2)}
     <tr><td><strong>1차</strong></td><td style="text-align:right;font-family:var(--mono)">4주</td><td style="text-align:right;font-family:var(--mono)">₩472,500</td><td style="text-align:center"><span class="badge b-buy">완료</span></td></tr>
     <tr><td><strong>2차</strong></td><td style="text-align:right;font-family:var(--mono)">5주</td><td style="text-align:right;font-family:var(--mono)">₩457,500</td><td style="text-align:center"><span class="badge b-buy">완료</span></td></tr>
   </tbody></table></div>
-  <div style="margin-top:8px;line-height:1.7;font-size:13px">→ <b>9주 · 평단 ₩464,166 · 상한 도달</b>(계획가 430,000 대비 상향 체결). <b style="color:var(--red)">9주 초과 금지</b>.<br>
+  <div style="margin-top:8px;line-height:1.7;font-size:13px">→ <b>10주 · 평단 ₩464,000</b>(2026-08-26 1주 추가매수로 9→10주). <b style="color:var(--red)">10주 초과 금지</b>.<br>
     <b>익절</b>: 1차 <b>₩630,000</b>(50일선 회복) 일부 · 2차 <b>₩810,000</b>(목표주가 806,000) 일부 — 한 번에 전량 ✕, 단계적 분할.<br>
-    <b>신규자금 배분</b>(8/2~03): 월급 이체 408만원 → HD현대 2차매수(215만원) + 잔여 179만원 현대글로비스 8주 추가매수(총 11주, 평단 196,063)로 <b>전액 소진</b>(예수금 0원).<br><br>
-    <b>3단계 — 삼성 강세 반등 시 (집중도 완화)</b>
+    <b>신규자금 배분</b>(8/2~03): 월급 이체 408만원 → HD현대 2차매수(215만원) + 잔여 179만원 현대글로비스 8주 추가매수(총 11주)로 <b>전액 소진</b>(예수금 0원).<br><br>
+    <b>2-1단계 — 비중 재조정 (완료, 2026-08-26)</b>
   </div>
-  <div class="tbl-wrap" style="margin-top:6px"><table><thead><tr><th>매도(트림)</th><th style="text-align:right">목표</th><th style="text-align:right">익절가(트리거)</th></tr></thead><tbody>
-    <tr><td><strong>삼성전자</strong></td><td style="text-align:right;font-family:var(--mono)">37%→28%</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">₩400,000</td></tr>
+  <div class="tbl-wrap" style="margin-top:6px"><table><thead><tr><th>종목</th><th style="text-align:center">조정</th><th style="text-align:right">수량 변화</th><th style="text-align:center">상태</th></tr></thead><tbody>
+    <tr><td><strong>삼성전자</strong></td><td style="text-align:center"><span class="badge b-sell">매도</span></td><td style="text-align:right;font-family:var(--mono)">76 → 72주 (−4)</td><td style="text-align:center"><span class="badge b-hold">완료</span></td></tr>
+    <tr><td><strong>KODEX200</strong></td><td style="text-align:center"><span class="badge b-sell">매도</span></td><td style="text-align:right;font-family:var(--mono)">106 → 80주 (−26)</td><td style="text-align:center"><span class="badge b-hold">완료</span></td></tr>
+    <tr><td><strong>현대글로비스</strong></td><td style="text-align:center"><span class="badge b-buy">매수</span></td><td style="text-align:right;font-family:var(--mono)">11 → 24주 (+13)</td><td style="text-align:center"><span class="badge b-hold">완료</span></td></tr>
+    <tr><td><strong>HD현대중공업</strong></td><td style="text-align:center"><span class="badge b-buy">매수</span></td><td style="text-align:right;font-family:var(--mono)">9 → 10주 (+1)</td><td style="text-align:center"><span class="badge b-hold">완료</span></td></tr>
   </tbody></table></div>
-  <div style="margin-top:8px;line-height:1.7;font-size:13px">→ 트림 대금은 <b>현금(예수금)으로 보존</b>(재투자 보류). 현금 목표 <b>14%</b>. <span style="opacity:.7">(8/3 삼성 250,000대 — 트리거까지 아직 요원)</span></div>
-  <div style="margin-top:10px;opacity:.7;font-size:11px">※ 익절가 도달 시 분할(sell into strength), 시장가 금지. <b>SK하이닉스·삼성전자·KODEX200·현대차·HD현대중공업: 가격 손절선 전면 폐지(2026-08-03)</b> — 아래 종목별 펀더멘털 체크리스트로 대체(2개 이상 해당 시 재검토). <b>현대글로비스만 가격 기준 유지</b>: 경계 ₩180,000 / 정리검토 ₩170,000(종가 기준 정성판단, 기계적 매도 아님).</div>
+  <div style="margin-top:8px;line-height:1.7;font-size:13px">→ 반도체 비중 축소분을 현대글로비스·HD현대중공업으로 이전, <b>현금 전액 재투자 완료</b>(예수금 0원). 결과적으로 현금 비중이 목표 10%를 하회 — 회복 시점·방법은 다음 재검토 안건.<br><br>
+    <b>3단계 — 삼성 강세 반등 시 (집중도 완화, 대기 중)</b>
+  </div>
+  <div class="tbl-wrap" style="margin-top:6px"><table><thead><tr><th>매도(트림)</th><th style="text-align:right">목표비중</th><th style="text-align:right">익절가(트리거)</th></tr></thead><tbody>
+    <tr><td><strong>삼성전자</strong></td><td style="text-align:right;font-family:var(--mono)">30%</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">₩400,000</td></tr>
+  </tbody></table></div>
+  <div style="margin-top:8px;line-height:1.7;font-size:13px">→ 트림 대금은 <b>현금(예수금)으로 보존</b>(재투자 보류). 현금 목표 <b>10%</b>. <span style="opacity:.7">(8월 기준 삼성 250,000~260,000대 — 트리거까지 아직 요원)</span></div>
+  <div style="margin-top:10px;opacity:.7;font-size:11px">※ 익절가 도달 시 분할(sell into strength), 시장가 금지. <b>전 6종목 가격 손절선 폐지(2026-08-26 · 현대글로비스도 편입, 종전 경계 180,000/정리검토 170,000 폐지)</b> — 아래 종목별 펀더멘털 체크리스트로 완전 대체(2개 이상 해당 시 재검토 대상).</div>
   <div class="divider"></div>
-  <p class="sec">종목별 펀더멘털 훼손 체크리스트 <span class="tag">가격 손절선 대체 · 2026-08-03</span></p>
+  <p class="sec">종목별 펀더멘털 훼손 체크리스트 <span class="tag">가격 손절선 대체 · 2026-08-26 (전 6종목)</span></p>
   <div style="opacity:.8;margin-bottom:10px;font-size:12px">점검 시점: 분기 실적 발표 시 + 아래 이벤트 인지 시. <b>가격 하락 자체는 매도 사유가 아님</b> — 보유 논리의 훼손 여부만 점검. 각 종목 <b>2개 이상 해당 시</b> 보유 논리 재검토(claude.ai 상담 → 핸드오프 → 반영). 항목은 재검토 때마다 수정 가능.</div>
   <div class="card" style="font-size:13px;line-height:1.9;margin-bottom:10px">
     <div style="font-weight:700;color:var(--accent);margin-bottom:6px">반도체군 — SK하이닉스 · 삼성전자 · KODEX200</div>
@@ -426,6 +436,15 @@ select option{background:var(--bg2)}
     ☐ <b>연간 수주목표 미달</b> (268억달러 대폭 미달)<br>
     ☐ <b>원가 부담 심화</b> — 철강가 급등 등으로 영업이익률 훼손
   </div>
+  <div class="card" style="font-size:13px;line-height:1.9;margin-top:10px">
+    <div style="font-weight:700;color:var(--accent);margin-bottom:6px">현대글로비스 <span class="tag">2026-08-26 신설</span></div>
+    <div style="opacity:.7;font-size:11.5px;margin-bottom:6px">종전 가격 기준(경계 180,000 / 정리검토 170,000) 폐지, 아래 체크리스트로 대체.</div>
+    ☐ <b>PCTC 장기용선 전환 지연/역행</b> — 완성차 해상운송 원가구조 악화<br>
+    ☐ <b>컨테이너 해상운임 추가 급락</b> — 물류부문 구조적 훼손<br>
+    ☐ <b>보스턴다이내믹스 지분가치 훼손</b> — 매각·감액 등<br>
+    ☐ <b>연간 가이던스 미달</b> — 매출 31조 / 영업이익 2.1조 큰 폭 미달<br>
+    ☐ <b>주주환원정책 후퇴</b>
+  </div>
   <div class="divider"></div>
   <p class="sec">손절 / 목표가 (계획 가격선)</p>
   <div class="tbl-wrap"><table><thead><tr>
@@ -439,13 +458,12 @@ select option{background:var(--bg2)}
 
 <script>
 const DEF=[
-  {name:'SK하이닉스',qty:7,buy:942571,peak:1295000,cur:1306000,cat:'stock'},
-  {name:'삼성전자',qty:46,buy:196717,peak:224500,cur:226000,cat:'stock'},
-  {name:'카카오페이',qty:100,buy:50000,peak:50255,cur:55700,cat:'stock'},
-  {name:'KODEX200',qty:83,buy:88798,peak:88865,cur:100995,cat:'stock'},
-  {name:'금(Gold)',qty:43,buy:211440,peak:228200,cur:216620,cat:'gold'},
-  {name:'이더리움',qty:3.62244049,buy:3191797,peak:3461000,cur:3388000,cat:'coin'},
-  {name:'비트코인',qty:0.04702538,buy:113990654,peak:113992065,cur:113720000,cat:'coin'},
+  {name:'SK하이닉스',qty:5,buy:1843371,peak:1843371,cur:1843371,cat:'stock'},
+  {name:'삼성전자',qty:72,buy:279841,peak:279841,cur:279841,cat:'stock'},
+  {name:'현대차',qty:10,buy:483275,peak:483275,cur:483275,cat:'stock'},
+  {name:'현대글로비스',qty:24,buy:203883,peak:203883,cur:203883,cat:'stock'},
+  {name:'HD현대중공업',qty:10,buy:464000,peak:464000,cur:464000,cat:'stock'},
+  {name:'KODEX200',qty:80,buy:121055,peak:121055,cur:121055,cat:'stock'},
 ];
 const SAMPLE='[{"name":"SK하이닉스","cur":1900000,"vwap":1885000,"rsi":62.4,"ma5":1870000,"ma20":1810000,"ma50":1750000,"volratio":1.8},{"name":"삼성전자","cur":275000,"vwap":273500,"rsi":55.1,"ma5":274000,"ma20":270000,"ma50":262000,"volratio":1.1},{"name":"현대차","cur":455000,"vwap":452000,"rsi":48.7,"ma5":458000,"ma20":465000,"ma50":470000,"volratio":0.9},{"name":"현대글로비스","cur":185000,"vwap":184000,"rsi":46.2,"ma5":186000,"ma20":189000,"ma50":191000,"volratio":0.8},{"name":"HD현대중공업","cur":450000,"vwap":448000,"rsi":51.8,"ma5":452000,"ma20":460000,"ma50":455000,"volratio":1.4},{"name":"KODEX200","cur":118500,"vwap":118000,"rsi":53.2,"ma5":118200,"ma20":117000,"ma50":115500,"volratio":1.0}]';
 
@@ -922,13 +940,13 @@ function applyJSON(){
 
 // 손절선 null = 가격 손절선 폐지 (펀더멘털 훼손 체크리스트로 대체, 2026-08-03 전면개편)
 // 형식: [손절가, 1차목표, 2차목표, (선택)경계선]. 현대글로비스만 가격 기준 유지.
-const PLAN_LEVELS={'SK하이닉스':[null,3065000,3500000],'삼성전자':[null,400000,500000],'현대차':[null,580000,660000],'KODEX200':[null,150000,160000],'HD현대중공업':[null,630000,810000],'현대글로비스':[170000,null,null,180000]};
+const PLAN_LEVELS={'SK하이닉스':[null,3065000,3500000],'삼성전자':[null,400000,500000],'현대차':[null,580000,660000],'KODEX200':[null,150000,160000],'HD현대중공업':[null,630000,810000],'현대글로비스':[null,320000,null]};
 
 // PLAN_LEVELS 조회 (종목명 별칭 대응: 현대자동차→현대차 등)
 function planOf(name){return PLAN_LEVELS[name]||PLAN_LEVELS[canonName(name)]||null;}
 
 // ── 계획 재검토·손절선 자동 경고 ─────────────────────
-const PLAN_META={review:'2026-09-01',reviewNote:'월 1회 정기 (실적·급등락 등 이벤트 시 수시). 안건: 현대차 400,000선 재접근 확인'};
+const PLAN_META={review:'2026-09-01',reviewNote:'월 1회 정기 (실적·급등락 등 이벤트 시 수시). 안건: ①반도체 계열 64% 고집중 입장 정리 ②현대차 400,000선 재접근 ③현금 목표비중 10% 회복 시점·방법'};
 function planWarnings(){
   const w=[];
   const today=new Date();today.setHours(0,0,0,0);
@@ -1247,13 +1265,14 @@ function renderSignal(){
     if(s.qty===0)return;
     const _pl=planOf(s.name)||[];const stop=_pl[0]!==undefined?_pl[0]:s.peak*0.85,t1=_pl[1]||s.peak*1.05,t2=_pl[2]||s.peak*1.10;
     const noStop=!(stop>0); // 가격 손절선 폐지 종목
+    const noT2=!(_pl[2]>0)&&_pl[1]>0; // 1차목표만 설정된 종목(자동 fallback이 1차보다 낮아지는 것 방지)
     const toStop=noStop?0:(s.cur-stop)/s.cur*100,toT1=(t1-s.cur)/s.cur*100,sg=comboSig(s,S.tech[i]);
     const tr=document.createElement('tr');tr.className=catCls[s.cat]||'';
     tr.innerHTML=`<td><strong>${s.name}</strong></td>
       <td style="text-align:right;font-family:var(--mono)">₩${W(Math.round(s.cur))}</td>
       <td style="text-align:right;font-family:var(--mono);${noStop?'':'color:var(--red)'}">${noStop?'<span style="opacity:.55;font-size:11px">폐지*</span>':'₩'+W(Math.round(stop))}</td>
       <td style="text-align:right;font-family:var(--mono);color:var(--green)">₩${W(Math.round(t1))}</td>
-      <td style="text-align:right;font-family:var(--mono);color:var(--green)">₩${W(Math.round(t2))}</td>
+      <td style="text-align:right;font-family:var(--mono);${noT2?'':'color:var(--green)'}">${noT2?'<span style="opacity:.55;font-size:11px">미설정</span>':'₩'+W(Math.round(t2))}</td>
       <td style="text-align:right;font-family:var(--mono)${noStop?';opacity:.55':''}" class="${noStop?'':toStop>=0?'green':'red'}">${noStop?'—':P(toStop)}</td>
       <td style="text-align:right;font-family:var(--mono)" class="green">${P(Math.abs(toT1))}</td>
       <td style="text-align:center"><span class="badge ${sg.cls}">${sg.label}</span></td>`;
@@ -1440,7 +1459,7 @@ function renderTechReport(){
     +'<div style="font-size:11px;color:var(--muted);margin-top:8px">※ 지표 기반 자동 정리이며 투자 조언이 아닙니다. 매매는 규칙(지정가·관망)과 본인 판단에 따르세요.</div></div>';
 }
 
-const WATCH_CFG={name:'HD현대중공업',dip:430000,note:'매집 완료(9주 상한 도달, 2026-08-02) — 신규 진입 감시 종료, 익절 레벨(630,000/810,000) 관리로 전환'};
+const WATCH_CFG={name:'HD현대중공업',dip:430000,note:'매집 완료(10주 상한, 2026-08-26 1주 추가) — 신규 진입 감시 종료, 익절 레벨(630,000/810,000) 관리로 전환'};
 function renderWatch(){
   const el=document.getElementById('watch-alert');if(!el)return;
   const i=S.stocks.findIndex(s=>s.name===WATCH_CFG.name);
@@ -1470,7 +1489,7 @@ function renderWatch(){
 
 function renderPlan(){
   const el=document.getElementById('plan-tb'); if(!el)return;
-  const TG=[['삼성전자',28],['SK하이닉스',22],['KODEX200',22],['HD현대중공업',8],['현대차',6],['현금',14]];
+  const TG=[['삼성전자',30],['SK하이닉스',20],['KODEX200',14],['현대글로비스',9],['HD현대중공업',9],['현대차',8],['현금',10]];
   const cashDep=(S.cash||[]).filter(c=>!c.tax).reduce((a,c)=>a+(+c.bal||0),0);
   const tot=(S.stocks.reduce((a,s)=>a+s.qty*s.cur,0)+cashDep)||1;
   let html='';
