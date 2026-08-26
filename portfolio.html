@@ -367,7 +367,7 @@ select option{background:var(--bg2)}
 
 <div class="panel" id="panel-plan">
   <div id="plan-warn-plan"></div>
-  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-08-26 갱신, v8 — SK하이닉스↔KODEX200 목표비중 현실화) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.</div>
+  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-08-26 갱신, v8 — SK하이닉스↔KODEX200 목표비중 현실화) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.<div id="plan-major-label" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:12.5px;line-height:1.6"></div></div>
   <div class="alert a-good" style="margin-bottom:12px">🖐️ <b>전 종목 수동 모니터링 체제 (2026-08-26 재확인)</b> — 당분간 출국 계획 없음 → 자동주문(스탑로스) 세팅 불필요. 향후 재출국 시점에 필요성 재논의.</div>
   <details class="card" style="margin-bottom:12px;font-size:12.5px;line-height:1.6"><summary style="cursor:pointer;font-weight:700;color:var(--accent);list-style:none">📌 재검토 운용 룰 (셋 중 하나라도 발생 시 재검토)</summary><div style="margin-top:10px">
     ① <b>정기</b>: 월 1회 수준<br>
@@ -977,7 +977,14 @@ const PLAN_LEVELS={'SK하이닉스':[null,3065000,3500000],'삼성전자':[null,
 function planOf(name){return PLAN_LEVELS[name]||PLAN_LEVELS[canonName(name)]||null;}
 
 // ── 계획 재검토·손절선 자동 경고 ─────────────────────
-const PLAN_META={review:'2026-09-01',reviewNote:'월 1회 정기 (실적·급등락 등 이벤트 시 수시). 안건: ①현대차 400,000선 재접근 ②유동성 버퍼 적립 진행률(월 150만원). ※종합 재검토는 2027-01경 — 버퍼 15% 도달 여부 + 내부 현금비중 확보용 매도 + 반도체 64% 고집중 유지 여부 최종 판단'};
+// 재검토는 2트랙: 월 1회 정기(review) + 2027-01 종합(major).
+// major는 v8에서 '약 5개월 후(2027년 1월경)'로 지정된 것을 2027년 첫 거래일로 고정한 값.
+const PLAN_META={
+  review:'2026-09-01',
+  reviewNote:'월 1회 정기 (실적·급등락 등 이벤트 시 수시). 안건: ①현대차 400,000선 재접근 ②유동성 버퍼 적립 진행률(월 150만원)',
+  major:'2027-01-04',
+  majorNote:'유동성 버퍼 15% 도달 여부 · 내부 현금비중(10%) 확보용 매도 재검토 · 반도체 계열 64% 고집중 유지 여부 <b>최종 판단</b>'
+};
 function planWarnings(){
   const w=[];
   const today=new Date();today.setHours(0,0,0,0);
@@ -986,6 +993,12 @@ function planWarnings(){
   if(dd<0)w.push({lv:'bad',msg:'⚠️ <b>계획 재검토 기한 '+(-dd)+'일 경과</b> ('+PLAN_META.review+') — 계획 탭 재검토가 필요합니다'});
   else if(dd===0)w.push({lv:'warn',msg:'📋 <b>오늘은 계획 재검토일</b>입니다 — '+PLAN_META.reviewNote});
   else if(dd===1)w.push({lv:'warn',msg:'📋 <b>내일('+PLAN_META.review+') 계획 재검토 예정</b> — '+PLAN_META.reviewNote});
+  if(PLAN_META.major){
+    const mv=new Date(PLAN_META.major+'T00:00:00');
+    const md=Math.round((mv-today)/86400000);
+    if(md<0)w.push({lv:'bad',msg:'🗓️ <b>종합 재검토 기한 '+(-md)+'일 경과</b> ('+PLAN_META.major+') — 버퍼 15% 도달 여부·내부 현금비중·반도체 고집중 최종 판단이 필요합니다'});
+    else if(md<=14)w.push({lv:'warn',msg:'🗓️ <b>종합 재검토 '+(md===0?'D-DAY':'D-'+md)+'</b> ('+PLAN_META.major+') — 버퍼 15% 도달 여부·내부 현금비중·반도체 고집중 최종 판단 예정'});
+  }
   S.stocks.forEach(s=>{
     const pl=planOf(s.name);
     if(!pl||!(pl[0]>0)||!(s.qty>0)||!(s.cur>0))return; // 손절선 폐지 종목(null)은 경고 제외
@@ -1003,6 +1016,14 @@ function renderPlanWarnings(){
   });
   const lb=document.getElementById('plan-review-label');
   if(lb)lb.textContent=PLAN_META.review+' ('+PLAN_META.reviewNote+')';
+  const mj=document.getElementById('plan-major-label');
+  if(mj&&PLAN_META.major){
+    const today=new Date();today.setHours(0,0,0,0);
+    const dd=Math.round((new Date(PLAN_META.major+'T00:00:00')-today)/86400000);
+    const dtxt=dd>0?'D-'+dd:dd===0?'D-DAY':(-dd)+'일 경과';
+    mj.innerHTML='🗓️ <b>종합 재검토: '+PLAN_META.major+'</b> <span style="opacity:.7">('+dtxt+')</span><br>'
+      +'<span style="opacity:.85">'+PLAN_META.majorNote+'</span>';
+  }
 }
 
 function comboSig(s,t){
