@@ -682,7 +682,9 @@ async function refreshPrices(){
     alert('주식 시세는 Apps Script URL 설정이 필요합니다.\n(☁️ Google 동기화 탭에서 설정)\n코인만 갱신합니다.');
   }
   if(btn){btn.disabled=true;btn.textContent='⏳ 조회중';}
-  let okCnt=0,failList=[];
+  let okCnt=0,failList=[],errNote='';
+  // URL 미설정으로 주식 조회 자체를 못 한 경우도 실패로 집계 (조용히 0개 성공되는 것 방지)
+  const noUrl=(stockTargets.length&&!url)?stockTargets.map(t=>t.name):[];
   try{
     // ① 주식: Apps Script 프록시 경유
     if(stockTargets.length&&url){
@@ -698,7 +700,7 @@ async function refreshPrices(){
             okCnt++;
           } else failList.push(t.name);
         });
-      }catch(e){stockTargets.forEach(t=>failList.push(t.name));}
+      }catch(e){stockTargets.forEach(t=>failList.push(t.name));errNote=e&&e.message?e.message:String(e);}
     }
     // ② 코인: 업비트 공개 API 직접 (CORS 허용)
     if(coinTargets.length){
@@ -715,11 +717,15 @@ async function refreshPrices(){
             okCnt++;
           } else failList.push(t.name);
         });
-      }catch(e){coinTargets.forEach(t=>failList.push(t.name));}
+      }catch(e){coinTargets.forEach(t=>failList.push(t.name));errNote=errNote||(e&&e.message?e.message:String(e));}
     }
     sv();renderAll();
-    let msg='🔄 시세 갱신 완료: '+okCnt+'개 종목';
-    if(failList.length)msg+='\n❌ 실패: '+failList.join(', ')+'\n(Apps Script v3 재배포 여부를 확인하세요)';
+    let msg=(okCnt?'🔄 시세 갱신 완료: ':'⚠️ 시세 갱신 실패: ')+okCnt+'개 종목';
+    if(noUrl.length)msg+='\n❌ Apps Script URL 미설정으로 조회 불가: '+noUrl.join(', ')
+      +'\n→ [☁️ Google 동기화] 탭에서 URL을 저장하세요.'
+      +'\n※ URL은 브라우저·주소(origin)별로 따로 저장됩니다 — 배포본(github.io)에 저장해 두었어도 로컬본에는 다시 입력해야 합니다.';
+    if(failList.length)msg+='\n❌ 실패: '+failList.join(', ')+'\n(Apps Script v3 재배포 여부를 확인하세요)'
+      +(errNote?'\n오류: '+errNote:'');
     if(skipped.length)msg+='\n⏭️ 건너뜀(수동입력 필요): '+skipped.join(', ');
     alert(msg);
   } finally {
