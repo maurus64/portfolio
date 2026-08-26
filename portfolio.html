@@ -265,6 +265,7 @@ select option{background:var(--bg2)}
   </div>
   <div class="chart-wrap"><canvas id="plChart"></canvas></div>
   <div id="cash-sec"></div>
+  <div id="buf-sec"></div>
 </div>
 
 <!-- 매수 관리 -->
@@ -433,6 +434,8 @@ select option{background:var(--bg2)}
     <tr><td><strong>CMA(대기성)</strong></td><td style="text-align:right;font-family:var(--mono)">45만원</td><td style="font-size:12px">RP형 또는 MMW형, 즉시 유동성 필요 시 활용</td></tr>
     <tr style="border-top:2px solid var(--border)"><td><strong>합계</strong></td><td style="text-align:right;font-family:var(--mono)"><b>150만원</b></td><td style="font-size:12px;opacity:.7">매월</td></tr>
   </tbody></table></div>
+  <div class="alert a-info" style="margin-top:10px;font-size:12.5px;line-height:1.7">📝 <b>실행·기록 위치</b> — 실행일은 <b>매달 5일</b>, 기록은 <b>[대시보드] 탭 맨 아래 「💧 유동성 버퍼」 섹션</b>에서 합니다.<br>
+    <span style="opacity:.8">이체 후 [이번 달 적립 기록] 한 번이면 4건이 기록되고 잔액·누적원금·목표 15% 진행률이 자동 갱신됩니다. 미실행 시 대시보드에 알림이 뜹니다.</span></div>
   <div style="margin-top:10px;opacity:.7;font-size:11px">※ <b>배경</b>: 사모신용 시장 리스크 관련 칼럼(2026-08-26) 검토 후 논의. 해당 소스의 <b>예측 신뢰도는 낮다고 평가</b>했으나, "무현금 상태의 리스크 관리 취약성"이라는 지적 자체는 타당하다고 판단하여 별도 트랙으로 대응 결정. 참고용이며 투자 조언이 아닙니다.</div>
   <div class="divider"></div>
   <p class="sec">종목별 펀더멘털 훼손 체크리스트 <span class="tag">가격 손절선 대체 · 2026-08-26 (전 6종목)</span></p>
@@ -500,8 +503,9 @@ function ld(){
     hist:JSON.parse(localStorage.getItem('pf_h')||'[]'),
     ah:JSON.parse(localStorage.getItem('pf_ah')||'[]'),
     ts:localStorage.getItem('pf_ts')||'',
-    cash:JSON.parse(localStorage.getItem('pf_cash')||'[]')
-  };}catch(e){return{stocks:DEF.map(s=>({...s})),tech:DEF.map(s=>({name:s.name,vwap:0,rsi:0,ma5:0,ma20:0})),logs:[],hist:[],ah:[],ts:'',cash:[]};}
+    cash:JSON.parse(localStorage.getItem('pf_cash')||'[]'),
+    bufl:JSON.parse(localStorage.getItem('pf_bufl')||'[]')
+  };}catch(e){return{stocks:DEF.map(s=>({...s})),tech:DEF.map(s=>({name:s.name,vwap:0,rsi:0,ma5:0,ma20:0})),logs:[],hist:[],ah:[],ts:'',cash:[],bufl:[]};}
 }
 let S=ld();
 
@@ -514,6 +518,7 @@ function sv(){
   localStorage.setItem('pf_ah',JSON.stringify(S.ah));
   localStorage.setItem('pf_ts',now);
   localStorage.setItem('pf_cash',JSON.stringify(S.cash||[]));
+  localStorage.setItem('pf_bufl',JSON.stringify(S.bufl||[]));
   document.getElementById('ts-label').textContent='저장: '+now;
   // 자동 Google Sheets 저장
   if(localStorage.getItem('pf_auto_save')==='1'&&getGsUrl()){
@@ -828,7 +833,7 @@ async function gsSave(silent){
   const url=getGsUrl();
   if(!url){if(!silent)setSyncStatus('❌ Apps Script URL을 먼저 설정해주세요.','err');return;}
   if(!silent)setSyncStatus('⏳ Google Sheets에 저장 중...','info');
-  const payload=JSON.stringify({stocks:S.stocks,tech:S.tech,logs:S.logs,hist:S.hist,ah:S.ah,ts:S.ts,cash:S.cash||[]});
+  const payload=JSON.stringify({stocks:S.stocks,tech:S.tech,logs:S.logs,hist:S.hist,ah:S.ah,ts:S.ts,cash:S.cash||[],bufl:S.bufl||[]});
   try{
     await fetch(url,{method:'POST',mode:'no-cors',body:payload});
     if(!silent){setSyncStatus('✅ Google Sheets 저장 완료!','ok');addSyncLog('저장 완료 ('+S.stocks.length+'개 종목)');}
@@ -851,7 +856,7 @@ async function gsLoad(silent){
     if(!silent&&!confirm('Google Sheets 데이터로 교체하시겠습니까?\n\n종목 수: '+data.stocks.length+'개\n저장 시각: '+(data.ts||'불명')+'\n\n현재 기기 데이터는 덮어씌워집니다.'))return;
     S.stocks=data.stocks;
     S.tech=data.tech||data.stocks.map(s=>({name:s.name,vwap:0,rsi:0,ma5:0,ma20:0}));
-    S.logs=data.logs||[];S.hist=data.hist||[];S.ah=data.ah||[];S.ts=data.ts||'';S.cash=data.cash||[];
+    S.logs=data.logs||[];S.hist=data.hist||[];S.ah=data.ah||[];S.ts=data.ts||'';S.cash=data.cash||[];S.bufl=data.bufl||[];
     sv();renderAll();
     setSyncStatus('✅ 불러오기 완료! ('+S.stocks.length+'개 종목, 저장시각: '+S.ts+')','ok');
     addSyncLog('불러오기 완료');
@@ -999,6 +1004,17 @@ function planWarnings(){
     if(md<0)w.push({lv:'bad',msg:'🗓️ <b>종합 재검토 기한 '+(-md)+'일 경과</b> ('+PLAN_META.major+') — 버퍼 15% 도달 여부·내부 현금비중·반도체 고집중 최종 판단이 필요합니다'});
     else if(md<=14)w.push({lv:'warn',msg:'🗓️ <b>종합 재검토 '+(md===0?'D-DAY':'D-'+md)+'</b> ('+PLAN_META.major+') — 버퍼 15% 도달 여부·내부 현금비중·반도체 고집중 최종 판단 예정'});
   }
+  // 유동성 버퍼 월 적립 알림 (계좌를 등록한 경우에만)
+  if(typeof bufAccts==='function'&&bufAccts().length){
+    const ym=bufYMD(today).slice(0,7);
+    if(!bufLoggedYM(ym)){
+      const dnum=today.getDate(),gap=dnum-BUF_CFG.day;
+      const msg='💧 <b>'+ym+' 유동성 버퍼 적립</b> — 매달 '+BUF_CFG.day+'일 · 월 ₩'+W(BUF_MONTHLY)+' (적금45·국채30·금30·CMA45만원)';
+      if(gap>=10)w.push({lv:'bad',msg:msg+' — <b>'+gap+'일 경과, 미실행</b>'});
+      else if(gap>=0)w.push({lv:'warn',msg:msg+(gap===0?' — <b>오늘이 실행일</b>':' — <b>'+gap+'일 경과, 미실행</b>')});
+      else if(gap>=-3)w.push({lv:'warn',msg:msg+' — <b>D'+gap+'</b>'});
+    }
+  }
   S.stocks.forEach(s=>{
     const pl=planOf(s.name);
     if(!pl||!(pl[0]>0)||!(s.qty>0)||!(s.cur>0))return; // 손절선 폐지 종목(null)은 경고 제외
@@ -1045,28 +1061,30 @@ function editCash(i){const c=(S.cash||[])[i];if(!c)return;const b=prompt('잔액
 function delCash(i){const c=(S.cash||[])[i];if(!c)return;if(!confirm(c.name+' 계좌를 삭제할까요?'))return;S.cash.splice(i,1);sv();renderAll();}
 function renderCash(){
   const el=document.getElementById('cash-sec');if(!el)return;
-  const cash=S.cash||[];
+  const all=S.cash||[];
+  const cash=all.filter(c=>!c.buf);          // 버퍼 계좌는 아래 전용 섹션에서 관리
   const cashTot=cash.reduce((a,c)=>a+(+c.bal||0),0);
+  const bufTot=all.filter(c=>c.buf).reduce((a,c)=>a+(+c.bal||0),0);
   let stockTot=0;S.stocks.forEach(s=>{if(s.cat!=='cash')stockTot+=s.qty*s.cur;});
-  const total=stockTot+cashTot;
+  const total=stockTot+cashTot+bufTot;       // 총자산은 버퍼까지 포함
   const LIM=taxLimit();
   const taxA=cash.filter(c=>c.tax);
   const ytdTot=taxA.reduce((a,c)=>a+(+c.ytd||0),0);
   const pctY=Math.min(100,LIM?ytdTot/LIM*100:0);
   const bs='color:var(--accent);border-color:var(--accent);font-size:11px';
   const bd='color:var(--red);border-color:var(--red);font-size:11px';
-  const rows=cash.map((c,i)=>`<tr>
+  const rows=cash.map(c=>{const i=all.indexOf(c);return `<tr>
     <td><strong>${c.name}</strong>${c.tax?' <span class="badge b-add" style="font-size:10px">절세</span>':''}${c.tax?'<br><span style="font-size:11px;color:var(--muted)">올해 납입 ₩'+W(Math.round(+c.ytd||0))+'</span>':''}</td>
     <td style="text-align:right;font-family:var(--mono)">₩${W(Math.round(+c.bal||0))}</td>
-    <td style="text-align:center"><button class="btn btn-sm" style="${bs}" onclick="editCash(${i})">수정</button> <button class="btn btn-sm" style="${bd}" onclick="delCash(${i})">삭제</button></td></tr>`).join('');
+    <td style="text-align:center"><button class="btn btn-sm" style="${bs}" onclick="editCash(${i})">수정</button> <button class="btn btn-sm" style="${bd}" onclick="delCash(${i})">삭제</button></td></tr>`;}).join('');
   el.innerHTML=`<div class="divider"></div>
     <p class="sec">현금·계좌</p>
     <div class="tbl-wrap"><table><thead><tr><th>계좌</th><th style="text-align:right">잔액</th><th style="text-align:center">관리</th></tr></thead><tbody>${rows||'<tr><td colspan="3" style="color:var(--muted);text-align:center;padding:14px">등록된 현금·계좌가 없습니다.</td></tr>'}</tbody></table></div>
     <button class="btn btn-sm btn-p" style="margin-top:8px" onclick="addCash()">＋ 계좌 추가</button>
     <div class="grid2" style="margin-top:14px">
       <div class="metric"><div class="metric-label">현금·계좌 합계</div><div class="metric-value accent">₩${W(Math.round(cashTot))}</div></div>
-      <div class="metric"><div class="metric-label">총자산 (주식+현금)</div><div class="metric-value">₩${W(Math.round(total))}</div></div>
-    </div>`;
+      <div class="metric"><div class="metric-label">총자산 (주식+현금+버퍼)</div><div class="metric-value">₩${W(Math.round(total))}</div></div>
+    </div>${bufTot?'<div style="margin-top:8px;font-size:11px;color:var(--muted)">※ 유동성 버퍼 ₩'+W(Math.round(bufTot))+'는 아래 전용 섹션에서 관리합니다(위 합계·계획 탭 현금비중에는 미포함, 총자산에는 포함).</div>':''}`;
   if(taxA.length){
     el.innerHTML+=`<div style="margin-top:16px">
       <p class="sec">연말정산 진행률 <span class="tag">연금저축+IRP</span> <button class="btn btn-sm" style="font-size:11px;margin-left:6px" onclick="setTaxLimit()">한도 수정</button></p>
@@ -1075,6 +1093,142 @@ function renderCash(){
       <div style="font-size:11px;color:var(--muted);margin-top:6px">※ 연금저축 단독 한도 600만원. 정확한 공제율·한도는 소득에 따라 다르니 확인하세요.</div>
     </div>`;
   }
+}
+
+// ── 유동성 버퍼 (포트폴리오 외부 트랙, v7/v8) ──────────────
+// 계획: 월 150만원을 4분산 적립, 전체 순자산 대비 15% 도달이 목표.
+// 버퍼 계좌는 S.cash에 buf:true로 저장하되 계획 탭 현금비중 계산에서는 제외한다.
+const BUF_PLAN=[
+  {name:'적금',amt:450000,how:'저축은행·새마을금고·신협 등 우대금리, 5천만원 예금자보호 한도 내'},
+  {name:'국채',amt:300000,how:'개인투자용 국채 등, 만기보유 목적'},
+  {name:'금',amt:300000,how:'KRX 금시장 또는 금ETF (잔액은 평가액 — 수기 갱신 필요)'},
+  {name:'CMA(대기성)',amt:450000,how:'RP형 또는 MMW형'},
+];
+const BUF_CFG={day:5,target:15}; // 매달 5일 적립, 목표 비중 15%
+const BUF_MONTHLY=BUF_PLAN.reduce((a,p)=>a+p.amt,0);
+
+const bufYMD=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const bufAccts=()=>(S.cash||[]).filter(c=>c.buf);
+const bufTotal=()=>bufAccts().reduce((a,c)=>a+(+c.bal||0),0);
+const bufPrin=()=>bufAccts().reduce((a,c)=>a+(+c.prin||0),0);
+function bufNetWorth(){
+  let t=0;S.stocks.forEach(s=>{if(s.cat!=='cash')t+=s.qty*s.cur;});
+  return t+(S.cash||[]).reduce((a,c)=>a+(+c.bal||0),0);
+}
+const bufLoggedYM=ym=>(S.bufl||[]).some(e=>(e.d||'').slice(0,7)===ym);
+
+// 목표비중 도달까지 추가로 넣어야 할 금액. 적립하면 분모(순자산)도 함께 커지므로
+//   (buf+x)/(total+x)=w  →  x=(w·total−buf)/(1−w)
+function bufRemain(){
+  const w=BUF_CFG.target/100,tot=bufNetWorth(),b=bufTotal();
+  return Math.max(0,(w*tot-b)/(1-w));
+}
+
+function bufSetup(){
+  if(bufAccts().length){alert('이미 버퍼 계좌가 등록되어 있습니다.');return;}
+  if(!confirm('유동성 버퍼 4계좌를 한 번에 등록합니다.\n\n'+BUF_PLAN.map(p=>'· '+p.name+' (월 '+W(p.amt)+'원)').join('\n')+'\n\n잔액 0원으로 만들고, 이후 [이번 달 적립 기록]으로 채웁니다.'))return;
+  S.cash=S.cash||[];
+  BUF_PLAN.forEach(p=>S.cash.push({name:p.name,bal:0,prin:0,tax:false,ytd:0,buf:true}));
+  sv();renderAll();
+}
+
+// 이번 달 계획대로 4건 일괄 기록 + 잔액·누적원금 반영
+function bufLogMonth(){
+  const accs=bufAccts();
+  if(!accs.length){alert('먼저 [버퍼 4계좌 등록]을 진행하세요.');return;}
+  const now=new Date(),ym=bufYMD(now).slice(0,7);
+  if(bufLoggedYM(ym)&&!confirm(ym+' 적립 기록이 이미 있습니다. 그래도 추가할까요?'))return;
+  const d=new Date(now.getFullYear(),now.getMonth(),BUF_CFG.day);
+  const date=now<d?bufYMD(d):bufYMD(now); // 5일 전이면 5일자로, 지났으면 오늘자로 기록
+  if(!confirm(date+' 적립을 계획대로 기록합니다.\n\n'+BUF_PLAN.map(p=>'· '+p.name+' ₩'+W(p.amt)).join('\n')+'\n합계 ₩'+W(BUF_MONTHLY)+'\n\n각 계좌 잔액과 누적원금에도 더해집니다.'))return;
+  S.bufl=S.bufl||[];
+  BUF_PLAN.forEach(p=>{
+    S.bufl.push({d:date,n:p.name,a:p.amt});
+    const c=accs.find(x=>x.name===p.name);
+    if(c){c.bal=Math.round((+c.bal||0)+p.amt);c.prin=Math.round((+c.prin||0)+p.amt);}
+  });
+  sv();renderAll();
+  alert('✅ '+date+' 적립 4건을 기록했습니다.\n\n※ 금은 시세에 따라 평가액이 달라집니다 — 실제 평가액으로 [수정]해 주세요.');
+}
+
+function addBufLog(){
+  const accs=bufAccts();
+  if(!accs.length){alert('먼저 [버퍼 4계좌 등록]을 진행하세요.');return;}
+  const names=BUF_PLAN.map((p,i)=>(i+1)+'. '+p.name).join('\n');
+  const pick=prompt('항목 번호를 입력하세요.\n\n'+names,'1');
+  if(pick===null)return;
+  const p=BUF_PLAN[(+pick||0)-1];
+  if(!p){alert('1~'+BUF_PLAN.length+' 중에서 선택하세요.');return;}
+  const date=(prompt('날짜 (YYYY-MM-DD)',bufYMD(new Date()))||'').trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){alert('날짜 형식이 올바르지 않습니다.');return;}
+  const amt=Math.round(+prompt('금액(원) — '+p.name,p.amt)||0);
+  if(!amt)return;
+  S.bufl=S.bufl||[];S.bufl.push({d:date,n:p.name,a:amt});
+  const c=accs.find(x=>x.name===p.name);
+  if(c&&confirm('계좌 잔액·누적원금에도 ₩'+W(amt)+'을 더할까요?')){
+    c.bal=Math.round((+c.bal||0)+amt);c.prin=Math.round((+c.prin||0)+amt);
+  }
+  sv();renderAll();
+}
+
+function delBufLog(i){
+  const e=(S.bufl||[])[i];if(!e)return;
+  if(!confirm(e.d+' '+e.n+' ₩'+W(e.a)+' 기록을 삭제할까요?\n(계좌 잔액은 자동으로 되돌리지 않습니다)'))return;
+  S.bufl.splice(i,1);sv();renderAll();
+}
+
+function renderBuf(){
+  const el=document.getElementById('buf-sec');if(!el)return;
+  const accs=bufAccts();
+  const now=new Date(),ym=bufYMD(now).slice(0,7),done=bufLoggedYM(ym);
+  let h='<div class="divider"></div><p class="sec">💧 유동성 버퍼 <span class="tag">포트폴리오 외부 트랙 · 목표 '+BUF_CFG.target+'%</span></p>';
+
+  if(!accs.length){
+    h+='<div class="card" style="font-size:13px;line-height:1.7">아직 등록된 버퍼 계좌가 없습니다.<br>'
+      +'<span style="opacity:.7">월 ₩'+W(BUF_MONTHLY)+'을 4분산(적금·국채·금·CMA) 적립하는 계획입니다. 자세한 내용은 [📋 계획] 탭 참조.</span>'
+      +'<div style="margin-top:10px"><button class="btn btn-sm btn-p" onclick="bufSetup()">＋ 버퍼 4계좌 등록</button></div></div>';
+    el.innerHTML=h;return;
+  }
+
+  const bt=bufTotal(),bp=bufPrin(),nw=bufNetWorth()||1,pct=bt/nw*100,rem=bufRemain();
+  const months=rem>0?Math.ceil(rem/BUF_MONTHLY):0;
+  const gpct=Math.min(100,pct/BUF_CFG.target*100);
+
+  h+='<div class="tbl-wrap"><table><thead><tr><th>항목</th><th style="text-align:right">월 배분</th><th style="text-align:right">누적원금</th><th style="text-align:right">현재 잔액</th><th style="text-align:center">관리</th></tr></thead><tbody>';
+  BUF_PLAN.forEach(p=>{
+    const c=accs.find(x=>x.name===p.name),i=(S.cash||[]).indexOf(c);
+    h+='<tr><td><strong>'+p.name+'</strong><br><span style="font-size:11px;color:var(--muted)">'+p.how+'</span></td>'
+      +'<td style="text-align:right;font-family:var(--mono)">₩'+W(p.amt)+'</td>'
+      +'<td style="text-align:right;font-family:var(--mono);opacity:.75">'+(c?'₩'+W(Math.round(+c.prin||0)):'—')+'</td>'
+      +'<td style="text-align:right;font-family:var(--mono)">'+(c?'₩'+W(Math.round(+c.bal||0)):'<span style="color:var(--muted)">미등록</span>')+'</td>'
+      +'<td style="text-align:center">'+(c?'<button class="btn btn-sm" style="color:var(--accent);border-color:var(--accent);font-size:11px" onclick="editCash('+i+')">수정</button>':'')+'</td></tr>';
+  });
+  h+='<tr style="border-top:2px solid var(--border)"><td><strong>합계</strong></td>'
+    +'<td style="text-align:right;font-family:var(--mono)"><b>₩'+W(BUF_MONTHLY)+'</b></td>'
+    +'<td style="text-align:right;font-family:var(--mono);opacity:.75">₩'+W(Math.round(bp))+'</td>'
+    +'<td style="text-align:right;font-family:var(--mono)"><b>₩'+W(Math.round(bt))+'</b></td><td></td></tr>';
+  h+='</tbody></table></div>';
+
+  h+='<div style="margin-top:14px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">전체 순자산 ₩'+W(Math.round(nw))+' 대비 <b style="color:var(--fg)">'+pct.toFixed(1)+'%</b> / 목표 '+BUF_CFG.target+'%'
+    +(rem>0?' · 남은 금액 ₩'+W(Math.round(rem))+' (월 '+W(BUF_MONTHLY)+'원 기준 약 '+months+'개월)':' · <b style="color:var(--green)">목표 도달</b>')+'</div>'
+    +'<div style="background:var(--bg3);border-radius:6px;height:14px;overflow:hidden"><div style="height:100%;width:'+gpct+'%;background:'+(rem>0?'var(--accent)':'var(--green)')+';transition:width .3s"></div></div></div>';
+
+  h+='<div class="alert '+(done?'a-good':'a-info')+'" style="margin-top:12px;font-size:12.5px">'
+    +(done?'✅ <b>'+ym+' 적립 기록 완료</b>':'🗓️ <b>'+ym+' 적립 예정</b> — 매달 '+BUF_CFG.day+'일 실행')+'</div>';
+  h+='<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">'
+    +'<button class="btn btn-sm btn-p" onclick="bufLogMonth()">이번 달 적립 기록 (계획대로 4건)</button>'
+    +'<button class="btn btn-sm" onclick="addBufLog()">＋ 개별 기록</button></div>';
+
+  const lg=(S.bufl||[]).map((e,i)=>({e,i})).sort((a,b)=>(b.e.d||'').localeCompare(a.e.d||'')||b.i-a.i).slice(0,24);
+  h+='<p class="sec" style="margin-top:18px">적립 이력 <span style="opacity:.6;font-weight:400;font-size:12px">(최근 '+lg.length+'건 / 전체 '+((S.bufl||[]).length)+'건)</span></p>';
+  h+='<div class="tbl-wrap"><table><thead><tr><th>날짜</th><th>항목</th><th style="text-align:right">금액</th><th style="text-align:center">관리</th></tr></thead><tbody>';
+  h+=lg.length?lg.map(({e,i})=>'<tr><td style="font-family:var(--mono);font-size:12px">'+e.d+'</td><td>'+e.n+'</td>'
+      +'<td style="text-align:right;font-family:var(--mono)">₩'+W(Math.round(+e.a||0))+'</td>'
+      +'<td style="text-align:center"><button class="btn btn-sm" style="color:var(--red);border-color:var(--red);font-size:11px" onclick="delBufLog('+i+')">삭제</button></td></tr>').join('')
+    :'<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:14px">아직 적립 기록이 없습니다.</td></tr>';
+  h+='</tbody></table></div>';
+  h+='<div style="margin-top:8px;font-size:11px;color:var(--muted)">※ 버퍼는 <b>계획 탭 목표비중의 현금(10%)과 별개</b>입니다 — 주식계좌 내 예수금이 아니므로 비중 계산에서 제외됩니다. 금은 시세에 따라 평가액이 변하므로 누적원금과 잔액이 달라집니다.</div>';
+  el.innerHTML=h;
 }
 
 function renderDash(){
@@ -1563,7 +1717,7 @@ function planGapHint(nm,s,val,tw,tot,g){
 function renderPlan(){
   const el=document.getElementById('plan-tb'); if(!el)return;
   const TG=[['삼성전자',30],['SK하이닉스',17],['KODEX200',17],['현대글로비스',9],['HD현대중공업',9],['현대차',8],['현금',10]];
-  const cashDep=(S.cash||[]).filter(c=>!c.tax).reduce((a,c)=>a+(+c.bal||0),0);
+  const cashDep=(S.cash||[]).filter(c=>!c.tax&&!c.buf).reduce((a,c)=>a+(+c.bal||0),0); // buf=유동성 버퍼는 외부 트랙이라 제외
   const tot=(S.stocks.reduce((a,s)=>a+s.qty*s.cur,0)+cashDep)||1;
   let html='';
   TG.forEach(([nm,tw])=>{
@@ -1581,7 +1735,7 @@ function renderPlan(){
 
 function renderAll(){
   alignTech();
-  renderDash();renderBuy();renderSignal();renderTech();renderTechReport();renderLog();renderPlan();renderWatch();renderPlanWarnings();
+  renderDash();renderBuy();renderSignal();renderTech();renderTechReport();renderLog();renderPlan();renderWatch();renderBuf();renderPlanWarnings();
   if(S.ts)document.getElementById('ts-label').textContent='저장: '+S.ts;
 }
 
