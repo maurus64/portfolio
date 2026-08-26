@@ -367,7 +367,7 @@ select option{background:var(--bg2)}
 
 <div class="panel" id="panel-plan">
   <div id="plan-warn-plan"></div>
-  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-08-26 갱신, v7 — 즉시 매도 없음 결정 + 개인 유동성 버퍼 트랙 신설) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.</div>
+  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-08-26 갱신, v8 — SK하이닉스↔KODEX200 목표비중 현실화) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.</div>
   <div class="alert a-good" style="margin-bottom:12px">🖐️ <b>전 종목 수동 모니터링 체제 (2026-08-26 재확인)</b> — 당분간 출국 계획 없음 → 자동주문(스탑로스) 세팅 불필요. 향후 재출국 시점에 필요성 재논의.</div>
   <details class="card" style="margin-bottom:12px;font-size:12.5px;line-height:1.6"><summary style="cursor:pointer;font-weight:700;color:var(--accent);list-style:none">📌 재검토 운용 룰 (셋 중 하나라도 발생 시 재검토)</summary><div style="margin-top:10px">
     ① <b>정기</b>: 월 1회 수준<br>
@@ -377,7 +377,11 @@ select option{background:var(--bg2)}
   </div></details>
   <p class="sec">목표 비중 vs 현재</p>
   <div class="tbl-wrap"><table><thead><tr><th>종목</th><th style="text-align:right">현재</th><th style="text-align:right">목표</th><th style="text-align:center">조정</th></tr></thead><tbody id="plan-tb"></tbody></table></div>
-  <div style="margin-top:8px;opacity:.75;font-size:11.5px">※ 조정란의 <b>주 수</b>는 목표비중 도달에 필요한 근사치입니다(매수=신규자금 투입으로 총액도 증가, 매도=대금을 현금 보존해 총액 불변 가정, 수수료·세금 미반영). <b>1주=○%p</b>는 그 종목의 최소 조정 단위 — 이 값이 갭보다 크면 비중을 정확히 맞추는 것은 구조적으로 불가능합니다.<br>※ 2026-08-26 전면 재설정. <b>반도체 계열(삼성+SK+KODEX) 합산 64%</b> — 의도적 고집중 전략 여부는 추후 재논의 대상. 현대글로비스는 소액 위성종목에서 <b>정식 핵심 보유종목으로 격상</b>(3주→24주).</div>
+  <div style="margin-top:8px;opacity:.75;font-size:11.5px">※ 조정란의 <b>주 수</b>는 목표비중 도달에 필요한 근사치입니다(매수=신규자금 투입으로 총액도 증가, 매도=대금을 현금 보존해 총액 불변 가정, 수수료·세금 미반영). <b>1주=○%p</b>는 그 종목의 최소 조정 단위 — 이 값이 갭보다 크면 비중을 정확히 맞추는 것은 구조적으로 불가능합니다.</div>
+  <div class="alert a-good" style="margin-top:10px;font-size:12.5px;line-height:1.7">🎯 <b>SK하이닉스 20%→17% · KODEX200 14%→17% (2026-08-26, v8)</b><br>
+    SK하이닉스는 1주가 약 169~176만원으로 <b>1주 단위가 커서 20% 정밀 도달이 구조적으로 불가능</b>합니다(6주=19.5% / 7주=22.2%로 20%를 사이에 두고 건너뜀). 실제비중(약 16.8%)에 근접한 <b>17%로 현실화</b>하고, 하향분 3%p는 <b>1주 단가가 작아 정밀 조정에 유리한 KODEX200</b>이 흡수합니다.<br>
+    <span style="opacity:.75">→ <b>반도체 계열 합산 64%는 그대로 유지</b> — 구성 종목 간 비중만 재배분한 것이며 총합은 불변입니다.</span></div>
+  <div style="margin-top:8px;opacity:.75;font-size:11.5px">※ 2026-08-26 전면 재설정. <b>반도체 계열(삼성+SK+KODEX) 합산 64%</b> — 의도적 고집중 전략 여부는 추후 재논의 대상. 현대글로비스는 소액 위성종목에서 <b>정식 핵심 보유종목으로 격상</b>(3주→24주).</div>
   <div class="alert a-info" style="margin-top:10px;font-size:12.5px;line-height:1.7">🚦 <b>현금 10%는 즉시 매도로 채우지 않습니다 (2026-08-26 결정, v7)</b><br>
     포트폴리오 내부 현금비중 확보를 위한 <b>즉시 매도는 하지 않음</b> — 기존 보유 종목·비중 그대로 유지. 대신 아래 <b>개인 유동성 버퍼</b>(포트폴리오 외부 트랙)로 대응하고, 버퍼가 목표에 도달한 뒤 내부 현금비중 확보용 매도를 재검토합니다.<br>
     <span style="opacity:.75">→ 따라서 위 표의 <b>현금 항목 이탈(−10%p)은 의도된 상태</b>이며, 재검토 룰 ③(±5%p 이탈)의 자동 트리거 대상에서 당분간 제외합니다.</span></div>
@@ -403,6 +407,7 @@ select option{background:var(--bg2)}
     <tr><td><strong>KODEX200</strong></td><td style="text-align:center"><span class="badge b-sell">매도</span></td><td style="text-align:right;font-family:var(--mono)">106 → 80주 (−26)</td><td style="text-align:center"><span class="badge b-hold">완료</span></td></tr>
     <tr><td><strong>현대글로비스</strong></td><td style="text-align:center"><span class="badge b-buy">매수</span></td><td style="text-align:right;font-family:var(--mono)">11 → 24주 (+13)</td><td style="text-align:center"><span class="badge b-hold">완료</span></td></tr>
     <tr><td><strong>HD현대중공업</strong></td><td style="text-align:center"><span class="badge b-buy">매수</span></td><td style="text-align:right;font-family:var(--mono)">9 → 10주 (+1)</td><td style="text-align:center"><span class="badge b-hold">완료</span></td></tr>
+    <tr><td><strong>목표비중 조정</strong> <span style="opacity:.6;font-size:11px">(매매 없음)</span></td><td style="text-align:center"><span class="badge b-hold">조정</span></td><td style="text-align:right;font-family:var(--mono);font-size:12px">SK 20→17% · KODEX 14→17%</td><td style="text-align:center"><span class="badge b-hold">완료</span></td></tr>
   </tbody></table></div>
   <div style="margin-top:8px;line-height:1.7;font-size:13px">→ 반도체 비중 축소분을 현대글로비스·HD현대중공업으로 이전, <b>현금 전액 재투자 완료</b>(예수금 0원). 결과적으로 현금 비중이 목표 10%를 하회 — 회복 시점·방법은 다음 재검토 안건.<br><br>
     <b>3단계 — 삼성 강세 반등 시 (집중도 완화, 대기 중)</b>
@@ -972,7 +977,7 @@ const PLAN_LEVELS={'SK하이닉스':[null,3065000,3500000],'삼성전자':[null,
 function planOf(name){return PLAN_LEVELS[name]||PLAN_LEVELS[canonName(name)]||null;}
 
 // ── 계획 재검토·손절선 자동 경고 ─────────────────────
-const PLAN_META={review:'2026-09-01',reviewNote:'월 1회 정기 (실적·급등락 등 이벤트 시 수시). 안건: ①반도체 계열 64% 고집중 입장 정리 ②현대차 400,000선 재접근 ③개인 유동성 버퍼 적립 진행률(월 150만원) ④버퍼 15% 도달 후 내부 현금비중 확보용 매도 재검토 여부'};
+const PLAN_META={review:'2026-09-01',reviewNote:'월 1회 정기 (실적·급등락 등 이벤트 시 수시). 안건: ①현대차 400,000선 재접근 ②유동성 버퍼 적립 진행률(월 150만원). ※종합 재검토는 2027-01경 — 버퍼 15% 도달 여부 + 내부 현금비중 확보용 매도 + 반도체 64% 고집중 유지 여부 최종 판단'};
 function planWarnings(){
   const w=[];
   const today=new Date();today.setHours(0,0,0,0);
@@ -1536,7 +1541,7 @@ function planGapHint(nm,s,val,tw,tot,g){
 
 function renderPlan(){
   const el=document.getElementById('plan-tb'); if(!el)return;
-  const TG=[['삼성전자',30],['SK하이닉스',20],['KODEX200',14],['현대글로비스',9],['HD현대중공업',9],['현대차',8],['현금',10]];
+  const TG=[['삼성전자',30],['SK하이닉스',17],['KODEX200',17],['현대글로비스',9],['HD현대중공업',9],['현대차',8],['현금',10]];
   const cashDep=(S.cash||[]).filter(c=>!c.tax).reduce((a,c)=>a+(+c.bal||0),0);
   const tot=(S.stocks.reduce((a,s)=>a+s.qty*s.cur,0)+cashDep)||1;
   let html='';
