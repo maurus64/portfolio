@@ -367,17 +367,20 @@ select option{background:var(--bg2)}
 
 <div class="panel" id="panel-plan">
   <div id="plan-warn-plan"></div>
-  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-08-26 갱신, v6 — 전 6종목 손절선 폐지·목표비중 전면 재설정) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.</div>
+  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-08-26 갱신, v7 — 즉시 매도 없음 결정 + 개인 유동성 버퍼 트랙 신설) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.</div>
   <div class="alert a-good" style="margin-bottom:12px">🖐️ <b>전 종목 수동 모니터링 체제 (2026-08-26 재확인)</b> — 당분간 출국 계획 없음 → 자동주문(스탑로스) 세팅 불필요. 향후 재출국 시점에 필요성 재논의.</div>
   <details class="card" style="margin-bottom:12px;font-size:12.5px;line-height:1.6"><summary style="cursor:pointer;font-weight:700;color:var(--accent);list-style:none">📌 재검토 운용 룰 (셋 중 하나라도 발생 시 재검토)</summary><div style="margin-top:10px">
     ① <b>정기</b>: 월 1회 수준<br>
     ② <b>이벤트</b>: 보유종목 실적 발표 · FOMC · 급등락 · 종목별 펀더멘털 체크리스트 항목 발생<br>
-    ③ <b>비중</b>: 목표 비중 대비 ±5%p 이탈 종목 발생<br>
+    ③ <b>비중</b>: 목표 비중 대비 ±5%p 이탈 종목 발생 <span style="opacity:.7">(현금 항목은 v7 결정에 따라 당분간 제외)</span><br>
     <span style="opacity:.7">절차: claude.ai에서 시나리오 상담 → 결정 → Claude Code에서 이 탭 수정+커밋 (git 이력 = 계획 변경 일지)</span>
   </div></details>
   <p class="sec">목표 비중 vs 현재</p>
   <div class="tbl-wrap"><table><thead><tr><th>종목</th><th style="text-align:right">현재</th><th style="text-align:right">목표</th><th style="text-align:center">조정</th></tr></thead><tbody id="plan-tb"></tbody></table></div>
   <div style="margin-top:8px;opacity:.75;font-size:11.5px">※ 2026-08-26 전면 재설정. <b>반도체 계열(삼성+SK+KODEX) 합산 64%</b> — 의도적 고집중 전략 여부는 추후 재논의 대상. 현대글로비스는 소액 위성종목에서 <b>정식 핵심 보유종목으로 격상</b>(3주→24주).</div>
+  <div class="alert a-info" style="margin-top:10px;font-size:12.5px;line-height:1.7">🚦 <b>현금 10%는 즉시 매도로 채우지 않습니다 (2026-08-26 결정, v7)</b><br>
+    포트폴리오 내부 현금비중 확보를 위한 <b>즉시 매도는 하지 않음</b> — 기존 보유 종목·비중 그대로 유지. 대신 아래 <b>개인 유동성 버퍼</b>(포트폴리오 외부 트랙)로 대응하고, 버퍼가 목표에 도달한 뒤 내부 현금비중 확보용 매도를 재검토합니다.<br>
+    <span style="opacity:.75">→ 따라서 위 표의 <b>현금 항목 이탈(−10%p)은 의도된 상태</b>이며, 재검토 룰 ③(±5%p 이탈)의 자동 트리거 대상에서 당분간 제외합니다.</span></div>
   <div class="divider"></div>
         <p class="sec">실행 순서</p>
   <div style="line-height:1.7;font-size:13px">
@@ -407,8 +410,25 @@ select option{background:var(--bg2)}
   <div class="tbl-wrap" style="margin-top:6px"><table><thead><tr><th>매도(트림)</th><th style="text-align:right">목표비중</th><th style="text-align:right">익절가(트리거)</th></tr></thead><tbody>
     <tr><td><strong>삼성전자</strong></td><td style="text-align:right;font-family:var(--mono)">30%</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">₩400,000</td></tr>
   </tbody></table></div>
-  <div style="margin-top:8px;line-height:1.7;font-size:13px">→ 트림 대금은 <b>현금(예수금)으로 보존</b>(재투자 보류). 현금 목표 <b>10%</b>. <span style="opacity:.7">(8월 기준 삼성 250,000~260,000대 — 트리거까지 아직 요원)</span></div>
+  <div style="margin-top:8px;line-height:1.7;font-size:13px">→ 트림 대금은 <b>현금(예수금)으로 보존</b>(재투자 보류). 현금 목표 <b>10%</b>. <span style="opacity:.7">(8월 기준 삼성 250,000~260,000대 — 트리거까지 아직 요원)</span><br><span style="opacity:.75;font-size:12px">※ 이 단계는 <b>익절 트리거(₩400,000) 도달 시에만</b> 작동합니다. 트리거 전에 현금비중을 맞추려는 <b>선제 매도는 하지 않습니다</b>(2026-08-26 결정).</span></div>
   <div style="margin-top:10px;opacity:.7;font-size:11px">※ 익절가 도달 시 분할(sell into strength), 시장가 금지. <b>전 6종목 가격 손절선 폐지(2026-08-26 · 현대글로비스도 편입, 종전 경계 180,000/정리검토 170,000 폐지)</b> — 아래 종목별 펀더멘털 체크리스트로 완전 대체(2개 이상 해당 시 재검토 대상).</div>
+  <div class="divider"></div>
+  <p class="sec">개인 유동성 버퍼 <span class="tag">포트폴리오 외부 트랙 · 2026-08-26 신설</span></p>
+  <div style="opacity:.8;margin-bottom:10px;font-size:12px"><b>성격</b>: 증권계좌(포트폴리오) 리밸런싱과는 <b>별개</b>로 관리하는 개인 자산 전체 차원의 현금성 버퍼. 위 표의 주식계좌 내 현금비중(현재 0%)과는 구분되는 항목입니다.</div>
+  <div class="card" style="font-size:13px;line-height:1.8;margin-bottom:10px">
+    <div><b>목표 수준</b> — 전체 순자산(포트폴리오+신규적립) 대비 <b>약 15%</b> <span style="opacity:.7">(참고치, 강제 기한 없음)</span></div>
+    <div><b>진행 방식</b> — <b>순수 적립형</b>: 기존 포트폴리오는 매도하지 않고 신규 자금만 매월 투입</div>
+    <div><b>월 신규 자금</b> — 100만원(기존) + 50만원(추가) = <b>월 150만원</b></div>
+    <div><b>예상 도달</b> — 순수 적립만으로 15% 수준까지 <b>약 5개월</b> 추정 <span style="opacity:.7">(2026-08 기준, 포트폴리오 가치 변동은 별개 변수)</span></div>
+  </div>
+  <div class="tbl-wrap"><table><thead><tr><th>항목 <span style="opacity:.6;font-weight:400">(D형 — 4분산)</span></th><th style="text-align:right">월 배분액</th><th>운용 수단</th></tr></thead><tbody>
+    <tr><td><strong>적금</strong></td><td style="text-align:right;font-family:var(--mono)">45만원</td><td style="font-size:12px">저축은행·새마을금고·신협 등 우대금리 상품 우선 검토, <b>5천만원 예금자보호 한도 내</b></td></tr>
+    <tr><td><strong>국채</strong></td><td style="text-align:right;font-family:var(--mono)">30만원</td><td style="font-size:12px">개인투자용 국채 등, <b>만기보유 목적</b></td></tr>
+    <tr><td><strong>금</strong></td><td style="text-align:right;font-family:var(--mono)">30만원</td><td style="font-size:12px">KRX 금시장 또는 금ETF, 실물 대비 보관비용 고려</td></tr>
+    <tr><td><strong>CMA(대기성)</strong></td><td style="text-align:right;font-family:var(--mono)">45만원</td><td style="font-size:12px">RP형 또는 MMW형, 즉시 유동성 필요 시 활용</td></tr>
+    <tr style="border-top:2px solid var(--border)"><td><strong>합계</strong></td><td style="text-align:right;font-family:var(--mono)"><b>150만원</b></td><td style="font-size:12px;opacity:.7">매월</td></tr>
+  </tbody></table></div>
+  <div style="margin-top:10px;opacity:.7;font-size:11px">※ <b>배경</b>: 사모신용 시장 리스크 관련 칼럼(2026-08-26) 검토 후 논의. 해당 소스의 <b>예측 신뢰도는 낮다고 평가</b>했으나, "무현금 상태의 리스크 관리 취약성"이라는 지적 자체는 타당하다고 판단하여 별도 트랙으로 대응 결정. 참고용이며 투자 조언이 아닙니다.</div>
   <div class="divider"></div>
   <p class="sec">종목별 펀더멘털 훼손 체크리스트 <span class="tag">가격 손절선 대체 · 2026-08-26 (전 6종목)</span></p>
   <div style="opacity:.8;margin-bottom:10px;font-size:12px">점검 시점: 분기 실적 발표 시 + 아래 이벤트 인지 시. <b>가격 하락 자체는 매도 사유가 아님</b> — 보유 논리의 훼손 여부만 점검. 각 종목 <b>2개 이상 해당 시</b> 보유 논리 재검토(claude.ai 상담 → 핸드오프 → 반영). 항목은 재검토 때마다 수정 가능.</div>
@@ -952,7 +972,7 @@ const PLAN_LEVELS={'SK하이닉스':[null,3065000,3500000],'삼성전자':[null,
 function planOf(name){return PLAN_LEVELS[name]||PLAN_LEVELS[canonName(name)]||null;}
 
 // ── 계획 재검토·손절선 자동 경고 ─────────────────────
-const PLAN_META={review:'2026-09-01',reviewNote:'월 1회 정기 (실적·급등락 등 이벤트 시 수시). 안건: ①반도체 계열 64% 고집중 입장 정리 ②현대차 400,000선 재접근 ③현금 목표비중 10% 회복 시점·방법'};
+const PLAN_META={review:'2026-09-01',reviewNote:'월 1회 정기 (실적·급등락 등 이벤트 시 수시). 안건: ①반도체 계열 64% 고집중 입장 정리 ②현대차 400,000선 재접근 ③개인 유동성 버퍼 적립 진행률(월 150만원) ④버퍼 15% 도달 후 내부 현금비중 확보용 매도 재검토 여부'};
 function planWarnings(){
   const w=[];
   const today=new Date();today.setHours(0,0,0,0);
