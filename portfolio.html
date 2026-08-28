@@ -422,7 +422,8 @@ select option{background:var(--bg2)}
   <p class="sec">개인 유동성 버퍼 <span class="tag">포트폴리오 외부 트랙 · 2026-08-28 (v10) 갱신</span></p>
   <div style="opacity:.8;margin-bottom:10px;font-size:12px"><b>성격</b>: 증권계좌(포트폴리오) 리밸런싱과는 <b>별개</b>로 관리하는 개인 자산 전체 차원의 현금성 버퍼. 위 표의 주식계좌 내 현금비중(현재 0%)과는 구분되는 항목입니다.</div>
   <div class="card" style="font-size:13px;line-height:1.8;margin-bottom:10px">
-    <div><b>목표 수준</b> — 전체 순자산(포트폴리오+신규적립) 대비 <b>약 15%</b> <span style="opacity:.7">(참고치, 강제 기한 없음)</span></div>
+    <div><b>목표 수준</b> — 전체 순자산 대비 <b>약 15%</b> <span style="opacity:.7">(참고치, 강제 기한 없음)</span><br>
+      <span style="opacity:.75;font-size:12px">※ <b>2026-08-28 결정: 연금계좌(퇴직연금 IRP · 연금저축 CMA)는 전체 순자산에 포함하지 않습니다.</b> 중도인출이 불가하거나 페널티가 있어 위기 시 동원 가능한 자산이 아니기 때문입니다. 분모 = 주식계좌 + 버퍼 계좌.</span></div>
     <div><b>진행 방식</b> — <b>순수 적립형</b>: 기존 포트폴리오는 매도하지 않고 신규 자금만 매월 투입</div>
     <div><b>월 신규 자금</b> — <b>월 165만원</b> <span style="opacity:.7">(2026-08-28 v10에서 150만원 → 165만원 증액. 금을 정액 30만원에서 정량 2g으로 바꾸며 조정)</span></div>
     <div><b>예상 도달</b> — 2026-08-28 14:04 전 계좌 실측 기준 남은 <b>약 644만원</b>, 월 165만원이면 <b>약 3.9개월</b> <span style="opacity:.7">(대시보드 💧 섹션에서 현재 시세로 실시간 재계산됩니다)</span></div>
@@ -1148,10 +1149,14 @@ const bufYMD=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+S
 const bufAccts=()=>(S.cash||[]).filter(c=>c.buf);
 const bufTotal=()=>bufAccts().reduce((a,c)=>a+(+c.bal||0),0);
 const bufPrin=()=>bufAccts().reduce((a,c)=>a+(+c.prin||0),0);
+// 버퍼 15% 산정의 분모. 연금계좌(tax:true — IRP·연금저축)는 중도인출 제약으로
+// 위기 시 동원할 수 없으므로 2026-08-28 결정에 따라 순자산에서 제외한다.
+// (대시보드 '총자산' 지표는 연금까지 포함하므로 두 값은 다를 수 있음)
 function bufNetWorth(){
   let t=0;S.stocks.forEach(s=>{if(s.cat!=='cash')t+=s.qty*s.cur;});
-  return t+(S.cash||[]).reduce((a,c)=>a+(+c.bal||0),0);
+  return t+(S.cash||[]).filter(c=>!c.tax).reduce((a,c)=>a+(+c.bal||0),0);
 }
+const bufPension=()=>(S.cash||[]).filter(c=>c.tax).reduce((a,c)=>a+(+c.bal||0),0);
 const bufLoggedYM=ym=>(S.bufl||[]).some(e=>(e.d||'').slice(0,7)===ym);
 
 // 목표비중 도달까지 추가로 넣어야 할 금액. 적립하면 분모(순자산)도 함께 커지므로
@@ -1274,7 +1279,8 @@ function renderBuf(){
   h+='</tbody></table></div>';
   if(carryTot>0)h+='<div style="margin-top:6px;font-size:11px;color:var(--muted)">※ <b>이월</b> = 계획 배분액 × 실행일 경과 개월수('+bufMonthsDue()+') − 실제 기록액. 미집행분이 다른 계좌(예: CMA)에 대기 중일 수 있습니다. 금은 정량 매수라 이월을 계산하지 않습니다.</div>';
 
-  h+='<div style="margin-top:14px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">전체 순자산 ₩'+W(Math.round(nw))+' 대비 <b style="color:var(--fg)">'+pct.toFixed(1)+'%</b> / 목표 '+BUF_CFG.target+'%'
+  const pen=bufPension();
+  h+='<div style="margin-top:14px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">전체 순자산'+(pen?'(연금 제외)':'')+' ₩'+W(Math.round(nw))+' 대비 <b style="color:var(--fg)">'+pct.toFixed(1)+'%</b> / 목표 '+BUF_CFG.target+'%'
     +(rem>0?' · 남은 금액 ₩'+W(Math.round(rem))+' (월 '+W(BUF_MONTHLY)+'원 기준 약 '+months+'개월)':' · <b style="color:var(--green)">목표 도달</b>')+'</div>'
     +'<div style="background:var(--bg3);border-radius:6px;height:14px;overflow:hidden"><div style="height:100%;width:'+gpct+'%;background:'+(rem>0?'var(--accent)':'var(--green)')+';transition:width .3s"></div></div></div>';
 
@@ -1292,6 +1298,7 @@ function renderBuf(){
       +'<td style="text-align:center"><button class="btn btn-sm" style="color:var(--red);border-color:var(--red);font-size:11px" onclick="delBufLog('+i+')">삭제</button></td></tr>').join('')
     :'<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:14px">아직 적립 기록이 없습니다.</td></tr>';
   h+='</tbody></table></div>';
+  if(pen)h+='<div style="margin-top:6px;font-size:11px;color:var(--muted)">※ 연금계좌(IRP·연금저축) ₩'+W(Math.round(pen))+'는 <b>중도인출 제약으로 버퍼 산정 분모에서 제외</b>됩니다(2026-08-28 결정). 포함 시 비중은 '+(bt/(nw+pen)*100).toFixed(2)+'%로 낮아집니다.</div>';
   h+='<div style="margin-top:8px;font-size:11px;color:var(--muted)">※ 버퍼는 <b>계획 탭 목표비중의 현금(10%)과 별개</b>입니다 — 주식계좌 내 예수금이 아니므로 비중 계산에서 제외됩니다. 금은 시세에 따라 평가액이 변하므로 누적원금과 잔액이 달라집니다.</div>';
   el.innerHTML=h;
 }
