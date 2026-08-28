@@ -425,7 +425,7 @@ select option{background:var(--bg2)}
     <div><b>목표 수준</b> — 전체 순자산(포트폴리오+신규적립) 대비 <b>약 15%</b> <span style="opacity:.7">(참고치, 강제 기한 없음)</span></div>
     <div><b>진행 방식</b> — <b>순수 적립형</b>: 기존 포트폴리오는 매도하지 않고 신규 자금만 매월 투입</div>
     <div><b>월 신규 자금</b> — <b>월 165만원</b> <span style="opacity:.7">(2026-08-28 v10에서 150만원 → 165만원 증액. 금을 정액 30만원에서 정량 2g으로 바꾸며 조정)</span></div>
-    <div><b>예상 도달</b> — 2026-08-28 실측 기준 남은 <b>약 707만원</b>, 월 165만원이면 <b>약 4.3개월</b> <span style="opacity:.7">(대시보드 💧 섹션에서 현재 시세로 실시간 재계산됩니다)</span></div>
+    <div><b>예상 도달</b> — 2026-08-28 실측 기준(예수금 이체 반영) 남은 <b>약 646만원</b>, 월 165만원이면 <b>약 3.9개월</b> <span style="opacity:.7">(대시보드 💧 섹션에서 현재 시세로 실시간 재계산됩니다)</span></div>
   </div>
   <div class="tbl-wrap"><table><thead><tr><th>항목 <span style="opacity:.6;font-weight:400">(D형 — 4분산)</span></th><th style="text-align:right">월 배분액</th><th>실행처</th><th style="text-align:center">상태</th></tr></thead><tbody>
     <tr><td><strong>적금</strong></td><td style="text-align:right;font-family:var(--mono)">45만원</td><td style="font-size:12px"><b>카카오뱅크 자유적금</b> — 연 3.50%, 6개월 만기 <b>2027-02-28</b><br><span style="opacity:.7">신협은 비과세 출자금 한도 소진으로 제외. 예금자보호 5천만원 한도 내</span></td><td style="text-align:center"><span class="badge b-buy">확정</span></td></tr>
@@ -438,9 +438,9 @@ select option{background:var(--bg2)}
   <div class="tbl-wrap"><table><thead><tr><th>항목</th><th style="text-align:right">계획 배분</th><th>실행 결과 (계좌 실측)</th><th style="text-align:center">상태</th></tr></thead><tbody>
     <tr><td><strong>적금</strong></td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="font-size:12px;font-family:var(--mono)">450,000 <span style="opacity:.7">카카오뱅크 자유적금</span></td><td style="text-align:center"><span class="badge b-buy">완료 (8/28 개설)</span></td></tr>
     <tr><td><strong>국채</strong></td><td style="text-align:right;font-family:var(--mono)">300,000</td><td style="font-size:12px"><span style="color:var(--gold);font-family:var(--mono)">0</span> — <b>자금은 CMA에 대기 중</b></td><td style="text-align:center"><span class="badge b-warn">계좌 미개설 · 이월</span></td></tr>
-    <tr><td><strong>금</strong></td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="font-size:12px;font-family:var(--mono)">투입 500,000 → 잔액 <b>495,638</b><br><span style="opacity:.7">금 2g 평가 407,160 (매수 410,400, −0.79%) + 예수금 88,478</span></td><td style="text-align:center"><span class="badge b-buy">완료</span></td></tr>
-    <tr><td><strong>CMA</strong></td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="font-size:12px;font-family:var(--mono)"><b>750,000</b><br><span style="opacity:.7">= 배분 450,000 + 국채 대기분 300,000</span></td><td style="text-align:center"><span class="badge b-buy">완료 (RP형)</span></td></tr>
-    <tr style="border-top:2px solid var(--border)"><td><strong>합계</strong></td><td style="text-align:right;font-family:var(--mono)"><b>1,650,000</b></td><td style="font-size:12px;font-family:var(--mono)">투입 <b>1,700,000</b> / 현재 잔액 <b>1,695,638</b></td><td style="text-align:center"><span style="font-size:11px;opacity:.75">전액 투입 완료<br>국채 배분만 미실행</span></td></tr>
+    <tr><td><strong>금</strong></td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="font-size:12px;font-family:var(--mono)">투입 500,000 → 잔액 <b>407,160</b><br><span style="opacity:.7">금 2g 평가액만 (매수 410,400, −0.79%)<br>잔여 예수금 88,478은 8/28 CMA로 이체</span></td><td style="text-align:center"><span class="badge b-buy">완료</span></td></tr>
+    <tr><td><strong>CMA</strong></td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="font-size:12px;font-family:var(--mono)"><b>1,360,671</b><br><span style="opacity:.7">= 배분 450,000 + 국채 대기 300,000<br>+ 종합계좌 예수금 522,193 (8/28 재배치)<br>+ 금계좌 예수금 88,478 (8/28 버퍼 내부 이동)</span></td><td style="text-align:center"><span class="badge b-buy">완료 (RP형)</span></td></tr>
+    <tr style="border-top:2px solid var(--border)"><td><strong>합계</strong></td><td style="text-align:right;font-family:var(--mono)"><b>1,650,000</b></td><td style="font-size:12px;font-family:var(--mono)">신규 적립 <b>1,700,000</b><br>현재 잔액 <b>2,217,831</b> <span style="opacity:.7">(재배치 522,193 포함)</span></td><td style="text-align:center"><span style="font-size:11px;opacity:.75">전액 투입 완료<br>국채 배분만 미실행</span></td></tr>
   </tbody></table></div>
   <div style="margin-top:8px;opacity:.75;font-size:11.5px">※ <b>계획 165만원 전액이 이미 버퍼에 들어와 있습니다</b>(+금 초과입금 5만원). 국채 30만원은 "미투입"이 아니라 <b>CMA에 대기 중이며 채권으로 배분만 안 된 상태</b>입니다.<br>
     ※ 금은 정량 2g 매수라 시세에 따라 누적원금(500,000)과 잔액(495,638)이 달라집니다. 매수 수수료로 예수금은 89,600원이 아닌 88,478원입니다.</div>
@@ -448,13 +448,17 @@ select option{background:var(--bg2)}
     ① 미래에셋증권 M-STOCK 개인투자용 국채 전용계좌 개설 — <b>2026-09 진행 예정</b>(2026-08-28 결정)<br>
     ② 9월 국채 청약일 확인 후 청약 (8월 이월분 30만원 포함 1~2개월분 합산 가능)<br>
     <span style="opacity:.75">→ 9/5 적립분이 더해지면 이월이 60만원(2개월분)이 되어 대시보드에 알림이 뜹니다.</span></div>
-  <div class="alert a-info" style="margin-top:10px;font-size:12.5px;line-height:1.7">🤔 <b>검토 중 — 종합계좌 예수금 522,193원의 CMA 이체</b> (2026-08-28)<br>
-    투자용으로 이체했다가 남은 현금입니다. 순자산 총액은 변하지 않고 <b>어느 목표에 잡히는지만 달라집니다</b> — 같은 돈이 양쪽에 동시에 잡히지는 않습니다.
+  <div class="alert a-good" style="margin-top:10px;font-size:12.5px;line-height:1.7">✅ <b>종합계좌 예수금 522,193원 → CMA 이체 완료 (2026-08-28)</b><br>
+    투자용으로 이체했다가 남은 현금을 전액 버퍼로 옮겼습니다. <b>순자산 총액은 51,369,231원으로 불변</b>이며, 잡히는 목표만 바뀌었습니다.
     <div class="tbl-wrap" style="margin-top:8px"><table><thead><tr><th></th><th style="text-align:right">계획 탭 현금</th><th style="text-align:right">버퍼 비중</th><th style="text-align:right">15%까지 남은 금액</th><th style="text-align:right">소요</th></tr></thead><tbody>
-      <tr><td><strong>종합계좌 유지</strong></td><td style="text-align:right;font-family:var(--mono)">1.0%</td><td style="text-align:right;font-family:var(--mono)">3.30%</td><td style="text-align:right;font-family:var(--mono)">₩7,070,290</td><td style="text-align:right;font-family:var(--mono)">4.3개월</td></tr>
-      <tr><td><strong>CMA로 이체</strong></td><td style="text-align:right;font-family:var(--mono)">0.0%</td><td style="text-align:right;font-family:var(--mono)">4.32%</td><td style="text-align:right;font-family:var(--mono)">₩6,455,945</td><td style="text-align:right;font-family:var(--mono)">3.9개월</td></tr>
+      <tr style="opacity:.6"><td>이체 전</td><td style="text-align:right;font-family:var(--mono)">1.0%</td><td style="text-align:right;font-family:var(--mono)">3.30%</td><td style="text-align:right;font-family:var(--mono)">₩7,070,290</td><td style="text-align:right;font-family:var(--mono)">4.3개월</td></tr>
+      <tr><td><strong>이체 후</strong></td><td style="text-align:right;font-family:var(--mono)"><b>0.0%</b></td><td style="text-align:right;font-family:var(--mono)"><b>4.32%</b></td><td style="text-align:right;font-family:var(--mono)"><b>₩6,455,945</b></td><td style="text-align:right;font-family:var(--mono)"><b>3.9개월</b></td></tr>
     </tbody></table></div>
-    <span style="opacity:.75">→ v7 결정(현금 10%는 즉시 매도로 채우지 않고 버퍼 우선)과는 이체 쪽이 결이 맞습니다. 다만 주식 매수 여력은 사라집니다. 참고용이며 투자 조언이 아닙니다.</span></div>
+    <span style="opacity:.75">→ 예수금 0원 복귀로 계획 탭 현금 항목은 다시 0%(목표 10% 대비 −10%p)가 되었습니다. 이는 v7 결정에 따른 <b>의도된 상태</b>이며, 버퍼 15% 도달 후 2027-01 종합 재검토에서 다룹니다.<br>
+    ⚠️ 이 이체는 <b>신규 적립이 아니라 자산 재배치</b>입니다 — 앱 적립 이력에는 넣지 않고 CMA 잔액에만 반영합니다(누적원금과 잔액이 갈리는 이유).</span></div>
+  <div class="alert a-good" style="margin-top:10px;font-size:12.5px;line-height:1.7">✅ <b>금계좌 잔여 예수금 88,478원 → CMA 이체 완료 (2026-08-28)</b><br>
+    금 2g 매수 후 남아 있던 예수금입니다. <b>버퍼 계좌 사이의 내부 이동</b>이라 버퍼 합계·비중·도달 시점은 그대로입니다(₩2,217,831 · 4.32% · 3.9개월).<br>
+    <span style="opacity:.75">→ 부수 효과: 금 계좌가 <b>순수하게 금 2g 평가액만</b> 담게 되어, 누적원금 500,000 대비 잔액 407,160의 차이가 <b>이체 88,478 + 금 시세손익 −3,240 + 매수수수료</b>로 분해됩니다.</span></div>
   <div class="alert a-info" style="margin-top:12px;font-size:12.5px;line-height:1.7">📝 <b>실행·기록 위치</b> — 실행일은 <b>매달 5일</b>, 기록은 <b>[대시보드] 탭 맨 아래 「💧 유동성 버퍼」 섹션</b>에서 합니다.<br>
     <span style="opacity:.8">이체 후 [적립 기록]에서 기준월을 고르고 항목별 실제 금액을 입력하면(미실행은 0 → 이월) 잔액·누적원금·목표 15% 진행률이 자동 갱신됩니다. 지난 달 소급 입력도 같은 버튼으로 합니다.</span></div>
   <div style="margin-top:10px;opacity:.7;font-size:11px">※ <b>배경</b>: 사모신용 시장 리스크 관련 칼럼(2026-08-26) 검토 후 논의. 해당 소스의 <b>예측 신뢰도는 낮다고 평가</b>했으나, "무현금 상태의 리스크 관리 취약성"이라는 지적 자체는 타당하다고 판단하여 별도 트랙으로 대응 결정. 참고용이며 투자 조언이 아닙니다.</div>
@@ -1007,7 +1011,7 @@ function planOf(name){return PLAN_LEVELS[name]||PLAN_LEVELS[canonName(name)]||nu
 // major는 v8에서 '약 5개월 후(2027년 1월경)'로 지정된 것을 2027년 첫 거래일로 고정한 값.
 const PLAN_META={
   review:'2026-09-01',
-  reviewNote:'월 1회 정기 (실적·급등락 등 이벤트 시 수시). 안건: ①현대차 400,000선 하회 검토(8/28 종가권 399,000 · −17.44% · 8/28 결정으로 9/1까지 유예) ②유동성 버퍼 적립 진행률(월 165만원) ③종합계좌 예수금 522,193원 CMA 이체 여부',
+  reviewNote:'월 1회 정기 (실적·급등락 등 이벤트 시 수시). 안건: ①현대차 400,000선 하회 검토(8/28 종가권 399,000 · −17.44% · 8/28 결정으로 9/1까지 유예) ②유동성 버퍼 적립 진행률(월 165만원) ③(해결) 예수금 522,193원은 2026-08-28 CMA 이체 완료',
   major:'2027-01-04',
   majorNote:'유동성 버퍼 15% 도달 여부 · 내부 현금비중(10%) 확보용 매도 재검토 · 반도체 계열 64% 고집중 유지 여부 <b>최종 판단</b>'
 };
