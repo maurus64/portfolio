@@ -425,7 +425,7 @@ select option{background:var(--bg2)}
     <div><b>목표 수준</b> — 전체 순자산(포트폴리오+신규적립) 대비 <b>약 15%</b> <span style="opacity:.7">(참고치, 강제 기한 없음)</span></div>
     <div><b>진행 방식</b> — <b>순수 적립형</b>: 기존 포트폴리오는 매도하지 않고 신규 자금만 매월 투입</div>
     <div><b>월 신규 자금</b> — <b>월 165만원</b> <span style="opacity:.7">(2026-08-28 v10에서 150만원 → 165만원 증액. 금을 정액 30만원에서 정량 2g으로 바꾸며 조정)</span></div>
-    <div><b>예상 도달</b> — 1회차 실행 후 기준 남은 <b>약 750만원</b>, 월 165만원이면 <b>약 4.5개월</b> <span style="opacity:.7">(포트폴리오 가치 변동은 별개 변수)</span></div>
+    <div><b>예상 도달</b> — 2026-08-28 실측 기준 남은 <b>약 707만원</b>, 월 165만원이면 <b>약 4.3개월</b> <span style="opacity:.7">(대시보드 💧 섹션에서 현재 시세로 실시간 재계산됩니다)</span></div>
   </div>
   <div class="tbl-wrap"><table><thead><tr><th>항목 <span style="opacity:.6;font-weight:400">(D형 — 4분산)</span></th><th style="text-align:right">월 배분액</th><th>실행처</th><th style="text-align:center">상태</th></tr></thead><tbody>
     <tr><td><strong>적금</strong></td><td style="text-align:right;font-family:var(--mono)">45만원</td><td style="font-size:12px"><b>카카오뱅크 자유적금</b> — 연 3.50%, 6개월 만기 <b>2027-02-28</b><br><span style="opacity:.7">신협은 비과세 출자금 한도 소진으로 제외. 예금자보호 5천만원 한도 내</span></td><td style="text-align:center"><span class="badge b-buy">확정</span></td></tr>
@@ -434,15 +434,16 @@ select option{background:var(--bg2)}
     <tr><td><strong>CMA(대기성)</strong></td><td style="text-align:right;font-family:var(--mono)">45만원</td><td style="font-size:12px"><b>삼성증권 53000285-05 [투신 CMA]</b> — RP형</td><td style="text-align:center"><span class="badge b-buy">확정</span></td></tr>
     <tr style="border-top:2px solid var(--border)"><td><strong>합계</strong></td><td style="text-align:right;font-family:var(--mono)"><b>165만원</b></td><td style="font-size:12px;opacity:.7">매월 5일 실행</td><td></td></tr>
   </tbody></table></div>
-  <p class="sec" style="margin-top:16px">1회차 실행 현황 <span class="tag">2026-08</span></p>
-  <div class="tbl-wrap"><table><thead><tr><th>항목</th><th style="text-align:right">계획</th><th style="text-align:right">실행</th><th style="text-align:center">상태</th></tr></thead><tbody>
-    <tr><td><strong>적금</strong></td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="text-align:center"><span class="badge b-buy">완료 (8/28 개설)</span></td></tr>
-    <tr><td><strong>국채</strong></td><td style="text-align:right;font-family:var(--mono)">300,000</td><td style="text-align:right;font-family:var(--mono);color:var(--gold)">0</td><td style="text-align:center"><span class="badge b-warn">9월 이월</span></td></tr>
-    <tr><td><strong>금</strong></td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="text-align:right;font-family:var(--mono)">500,000<br><span style="font-size:10px;opacity:.7">2g 매수 410,400</span></td><td style="text-align:center"><span class="badge b-buy">완료</span></td></tr>
-    <tr><td><strong>CMA</strong></td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="text-align:center"><span class="badge b-buy">완료 (RP형)</span></td></tr>
-    <tr style="border-top:2px solid var(--border)"><td><strong>합계</strong></td><td style="text-align:right;font-family:var(--mono)"><b>1,650,000</b></td><td style="text-align:right;font-family:var(--mono)"><b>1,400,000</b></td><td style="text-align:center"><span style="font-size:11px;opacity:.75">국채 30만원만 이월</span></td></tr>
+  <p class="sec" style="margin-top:16px">1회차 실행 현황 <span class="tag">2026-08 · 계좌 실측 2026-08-28</span></p>
+  <div class="tbl-wrap"><table><thead><tr><th>항목</th><th style="text-align:right">계획 배분</th><th>실행 결과 (계좌 실측)</th><th style="text-align:center">상태</th></tr></thead><tbody>
+    <tr><td><strong>적금</strong></td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="font-size:12px;font-family:var(--mono)">450,000 <span style="opacity:.7">카카오뱅크 자유적금</span></td><td style="text-align:center"><span class="badge b-buy">완료 (8/28 개설)</span></td></tr>
+    <tr><td><strong>국채</strong></td><td style="text-align:right;font-family:var(--mono)">300,000</td><td style="font-size:12px"><span style="color:var(--gold);font-family:var(--mono)">0</span> — <b>자금은 CMA에 대기 중</b></td><td style="text-align:center"><span class="badge b-warn">계좌 미개설 · 이월</span></td></tr>
+    <tr><td><strong>금</strong></td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="font-size:12px;font-family:var(--mono)">투입 500,000 → 잔액 <b>495,638</b><br><span style="opacity:.7">금 2g 평가 407,160 (매수 410,400, −0.79%) + 예수금 88,478</span></td><td style="text-align:center"><span class="badge b-buy">완료</span></td></tr>
+    <tr><td><strong>CMA</strong></td><td style="text-align:right;font-family:var(--mono)">450,000</td><td style="font-size:12px;font-family:var(--mono)"><b>750,000</b><br><span style="opacity:.7">= 배분 450,000 + 국채 대기분 300,000</span></td><td style="text-align:center"><span class="badge b-buy">완료 (RP형)</span></td></tr>
+    <tr style="border-top:2px solid var(--border)"><td><strong>합계</strong></td><td style="text-align:right;font-family:var(--mono)"><b>1,650,000</b></td><td style="font-size:12px;font-family:var(--mono)">투입 <b>1,700,000</b> / 현재 잔액 <b>1,695,638</b></td><td style="text-align:center"><span style="font-size:11px;opacity:.75">전액 투입 완료<br>국채 배분만 미실행</span></td></tr>
   </tbody></table></div>
-  <div style="margin-top:8px;opacity:.75;font-size:11.5px">※ 금은 50만원 입금 중 410,400원(2g)을 매수해 <b>89,600원이 금현물 계좌 예수금</b>으로 남아 있습니다 — 현금성 자산이므로 버퍼 잔액에는 포함됩니다.</div>
+  <div style="margin-top:8px;opacity:.75;font-size:11.5px">※ <b>계획 165만원 전액이 이미 버퍼에 들어와 있습니다</b>(+금 초과입금 5만원). 국채 30만원은 "미투입"이 아니라 <b>CMA에 대기 중이며 채권으로 배분만 안 된 상태</b>입니다.<br>
+    ※ 금은 정량 2g 매수라 시세에 따라 누적원금(500,000)과 잔액(495,638)이 달라집니다. 매수 수수료로 예수금은 89,600원이 아닌 88,478원입니다.</div>
   <div class="alert a-warn" style="margin-top:12px;font-size:12.5px;line-height:1.7">⬜ <b>미완료 항목</b><br>
     ① 미래에셋증권 M-STOCK 개인투자용 국채 전용계좌 개설<br>
     ② 9월 국채 청약일 확인 후 청약 (8월 이월분 포함 1~2개월분 합산 가능)<br>
