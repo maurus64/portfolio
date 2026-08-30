@@ -368,7 +368,7 @@ select option{background:var(--bg2)}
 
 <div class="panel" id="panel-plan">
   <div id="plan-warn-plan"></div>
-  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-08-28 갱신, v10 — 유동성 버퍼 월 165만원 증액·실행처 확정) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.<div id="plan-major-label" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:12.5px;line-height:1.6"></div></div>
+  <div class="alert a-info" style="margin-bottom:12px">📋 리밸런싱 계획 (2026-08-30 갱신, v11 — 코인 참고 트랙 편입) — 다음 재검토: <b id="plan-review-label"></b>. 참고용이며 투자 조언이 아닙니다.<div id="plan-major-label" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:12.5px;line-height:1.6"></div></div>
   <div class="alert a-good" style="margin-bottom:12px">🖐️ <b>전 종목 수동 모니터링 체제 (2026-08-26 재확인)</b> — 당분간 출국 계획 없음 → 자동주문(스탑로스) 세팅 불필요. 향후 재출국 시점에 필요성 재논의.</div>
   <details class="card" style="margin-bottom:12px;font-size:12.5px;line-height:1.6"><summary style="cursor:pointer;font-weight:700;color:var(--accent);list-style:none">📌 재검토 운용 룰 (셋 중 하나라도 발생 시 재검토)</summary><div style="margin-top:10px">
     ① <b>정기</b>: 월 1회 수준<br>
@@ -378,7 +378,7 @@ select option{background:var(--bg2)}
   </div></details>
   <p class="sec">목표 비중 vs 현재</p>
   <div class="tbl-wrap"><table><thead><tr><th>종목</th><th style="text-align:right">현재</th><th style="text-align:right">목표</th><th style="text-align:center">조정</th></tr></thead><tbody id="plan-tb"></tbody></table></div>
-  <div style="margin-top:8px;opacity:.75;font-size:11.5px">※ 조정란의 <b>주 수</b>는 목표비중 도달에 필요한 근사치입니다(매수=신규자금 투입으로 총액도 증가, 매도=대금을 현금 보존해 총액 불변 가정, 수수료·세금 미반영). <b>1주=○%p</b>는 그 종목의 최소 조정 단위 — 이 값이 갭보다 크면 비중을 정확히 맞추는 것은 구조적으로 불가능합니다.</div>
+  <div style="margin-top:8px;opacity:.75;font-size:11.5px">※ 이 표의 분모는 <b>국내주식 6종목 + 주식계좌 예수금</b>입니다 — 코인과 유동성 버퍼는 <b>제외</b>됩니다(포함하면 6종목 비중이 전부 희석됨).<br>※ 조정란의 <b>주 수</b>는 목표비중 도달에 필요한 근사치입니다(매수=신규자금 투입으로 총액도 증가, 매도=대금을 현금 보존해 총액 불변 가정, 수수료·세금 미반영). <b>1주=○%p</b>는 그 종목의 최소 조정 단위 — 이 값이 갭보다 크면 비중을 정확히 맞추는 것은 구조적으로 불가능합니다.</div>
   <div class="alert a-good" style="margin-top:10px;font-size:12.5px;line-height:1.7">🎯 <b>SK하이닉스 20%→17% · KODEX200 14%→17% (2026-08-26, v8)</b><br>
     SK하이닉스는 1주가 약 169~176만원으로 <b>1주 단위가 커서 20% 정밀 도달이 구조적으로 불가능</b>합니다(6주=19.5% / 7주=22.2%로 20%를 사이에 두고 건너뜀). 실제비중(약 16.8%)에 근접한 <b>17%로 현실화</b>하고, 하향분 3%p는 <b>1주 단가가 작아 정밀 조정에 유리한 KODEX200</b>이 흡수합니다.<br>
     <span style="opacity:.75">→ <b>반도체 계열 합산 64%는 그대로 유지</b> — 구성 종목 간 비중만 재배분한 것이며 총합은 불변입니다.</span></div>
@@ -423,10 +423,12 @@ select option{background:var(--bg2)}
   <div style="opacity:.8;margin-bottom:10px;font-size:12px"><b>성격</b>: 증권계좌(포트폴리오) 리밸런싱과는 <b>별개</b>로 관리하는 개인 자산 전체 차원의 현금성 버퍼. 위 표의 주식계좌 내 현금비중(현재 0%)과는 구분되는 항목입니다.</div>
   <div class="card" style="font-size:13px;line-height:1.8;margin-bottom:10px">
     <div><b>목표 수준</b> — 전체 순자산 대비 <b>약 15%</b> <span style="opacity:.7">(참고치, 강제 기한 없음)</span><br>
-      <span style="opacity:.75;font-size:12px">※ <b>2026-08-28 결정: 연금계좌(퇴직연금 IRP · 연금저축 CMA)는 전체 순자산에 포함하지 않습니다.</b> 중도인출이 불가하거나 페널티가 있어 위기 시 동원 가능한 자산이 아니기 때문입니다. 분모 = 주식계좌 + 버퍼 계좌.</span></div>
+      <span style="opacity:.75;font-size:12px">※ <b>분모 = 국내주식 + 코인 + 버퍼 계좌</b><br>
+      · <b>연금계좌(IRP·연금저축) 제외</b> (2026-08-28 결정) — 중도인출 불가·페널티로 위기 시 동원 불가<br>
+      · <b>코인 포함</b> (2026-08-30 B안 결정) — 즉시 현금화 가능. 단 코인 가격이 오르면 목표액도 함께 커지는 구조임에 유의</span></div>
     <div><b>진행 방식</b> — <b>순수 적립형</b>: 기존 포트폴리오는 매도하지 않고 신규 자금만 매월 투입</div>
     <div><b>월 신규 자금</b> — <b>월 165만원</b> <span style="opacity:.7">(2026-08-28 v10에서 150만원 → 165만원 증액. 금을 정액 30만원에서 정량 2g으로 바꾸며 조정)</span></div>
-    <div><b>예상 도달</b> — 2026-08-28 14:04 전 계좌 실측 기준 남은 <b>약 644만원</b>, 월 165만원이면 <b>약 3.9개월</b> <span style="opacity:.7">(대시보드 💧 섹션에서 현재 시세로 실시간 재계산됩니다)</span></div>
+    <div><b>예상 도달</b> — 코인 포함 기준 남은 <b>약 750만원</b>, 월 165만원이면 <b>약 4.5개월</b> <span style="opacity:.7">(코인 제외 시 644만원 / 3.9개월. 대시보드 💧 섹션에서 실시간 재계산)</span></div>
   </div>
   <div class="tbl-wrap"><table><thead><tr><th>항목 <span style="opacity:.6;font-weight:400">(D형 — 4분산)</span></th><th style="text-align:right">월 배분액</th><th>실행처</th><th style="text-align:center">상태</th></tr></thead><tbody>
     <tr><td><strong>적금</strong></td><td style="text-align:right;font-family:var(--mono)">45만원</td><td style="font-size:12px"><b>카카오뱅크 자유적금</b> — 연 3.50%, 6개월 만기 <b>2027-02-28</b><br><span style="opacity:.7">신협은 비과세 출자금 한도 소진으로 제외. 예금자보호 5천만원 한도 내</span></td><td style="text-align:center"><span class="badge b-buy">확정</span></td></tr>
@@ -463,6 +465,30 @@ select option{background:var(--bg2)}
   <div class="alert a-info" style="margin-top:12px;font-size:12.5px;line-height:1.7">📝 <b>실행·기록 위치</b> — 실행일은 <b>매달 5일</b>, 기록은 <b>[대시보드] 탭 맨 아래 「💧 유동성 버퍼」 섹션</b>에서 합니다.<br>
     <span style="opacity:.8">이체 후 [적립 기록]에서 기준월을 고르고 항목별 실제 금액을 입력하면(미실행은 0 → 이월) 잔액·누적원금·목표 15% 진행률이 자동 갱신됩니다. 지난 달 소급 입력도 같은 버튼으로 합니다.</span></div>
   <div style="margin-top:10px;opacity:.7;font-size:11px">※ <b>배경</b>: 사모신용 시장 리스크 관련 칼럼(2026-08-26) 검토 후 논의. 해당 소스의 <b>예측 신뢰도는 낮다고 평가</b>했으나, "무현금 상태의 리스크 관리 취약성"이라는 지적 자체는 타당하다고 판단하여 별도 트랙으로 대응 결정. 참고용이며 투자 조언이 아닙니다.</div>
+  <div class="divider"></div>
+  <p class="sec">🪙 코인 <span class="tag">참고 트랙 · 2026-08-30 (v11) 편입 · 관리규칙 없음</span></p>
+  <div class="alert a-info" style="margin-bottom:10px;font-size:12.5px;line-height:1.7">📌 <b>성격 결정 (B안, 2026-08-30)</b> — 전체 자산배분에는 포함하되 <b>목표비중·상한선 등 관리 규칙을 두지 않습니다.</b> 현재 방식(주간 정액매수)대로 무기한 지속하며, <b>정기 재검토 대상에 포함하지 않습니다</b>(요청 시에만 갱신).</div>
+  <div class="tbl-wrap"><table><thead><tr><th>코인</th><th style="text-align:right">주간 매수액</th><th style="text-align:right">월 환산(약)</th></tr></thead><tbody>
+    <tr><td><strong>비트코인 (BTC)</strong></td><td style="text-align:right;font-family:var(--mono)">40,000</td><td style="text-align:right;font-family:var(--mono)">173,000</td></tr>
+    <tr><td><strong>이더리움 (ETH)</strong></td><td style="text-align:right;font-family:var(--mono)">40,000</td><td style="text-align:right;font-family:var(--mono)">173,000</td></tr>
+    <tr><td><strong>리플 (XRP)</strong></td><td style="text-align:right;font-family:var(--mono)">20,000</td><td style="text-align:right;font-family:var(--mono)">87,000</td></tr>
+    <tr style="border-top:2px solid var(--border)"><td><strong>합계</strong></td><td style="text-align:right;font-family:var(--mono)"><b>100,000 / 주</b></td><td style="text-align:right;font-family:var(--mono)"><b>약 433,000</b></td></tr>
+  </tbody></table></div>
+  <p class="sec" style="margin-top:14px">보유 현황 <span class="tag">2026-08-28 스냅샷</span></p>
+  <div class="tbl-wrap"><table><thead><tr><th>코인</th><th style="text-align:right">수량</th><th style="text-align:right">평가금액</th><th style="text-align:right">매수금액</th><th style="text-align:right">평가손익</th></tr></thead><tbody>
+    <tr><td><strong>이더리움</strong></td><td style="text-align:right;font-family:var(--mono)">1.08052464</td><td style="text-align:right;font-family:var(--mono)">3,688,911</td><td style="text-align:right;font-family:var(--mono)">3,300,432</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">+388,479 (+11.77%)</td></tr>
+    <tr><td><strong>비트코인</strong></td><td style="text-align:right;font-family:var(--mono)">0.01380306</td><td style="text-align:right;font-family:var(--mono)">1,502,283</td><td style="text-align:right;font-family:var(--mono)">1,300,095</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">+202,189 (+15.55%)</td></tr>
+    <tr><td><strong>리플</strong></td><td style="text-align:right;font-family:var(--mono)">403.92044966</td><td style="text-align:right;font-family:var(--mono)">783,201</td><td style="text-align:right;font-family:var(--mono)">730,246</td><td style="text-align:right;font-family:var(--mono);color:var(--green)">+52,956 (+7.25%)</td></tr>
+    <tr style="border-top:2px solid var(--border)"><td><strong>합계</strong></td><td></td><td style="text-align:right;font-family:var(--mono)"><b>5,974,395</b></td><td style="text-align:right;font-family:var(--mono)">5,330,773</td><td style="text-align:right;font-family:var(--mono);color:var(--green)"><b>+643,624 (+12.1%)</b></td></tr>
+  </tbody></table></div>
+  <div style="margin-top:10px;opacity:.75;font-size:11.5px">※ 코인은 <b>계획 탭 목표비중 계산에서 제외</b>되고(6종목 비중 희석 방지), <b>유동성 버퍼 15% 분모에는 포함</b>됩니다(2026-08-30 B안).<br>
+    ※ 대시보드에 등록하면 [🔄 시세] 버튼이 <b>업비트 API로 시세를 자동 갱신</b>합니다(BTC·ETH·XRP 지원).</div>
+  <p class="sec" style="margin-top:16px">월간 총 신규 투자금액</p>
+  <div class="tbl-wrap"><table><thead><tr><th>항목</th><th style="text-align:right">월 금액</th></tr></thead><tbody>
+    <tr><td><strong>개인 유동성 버퍼</strong> <span style="opacity:.6;font-size:11px">(적금·국채·금·CMA)</span></td><td style="text-align:right;font-family:var(--mono)">1,650,000</td></tr>
+    <tr><td><strong>코인 DCA</strong> <span style="opacity:.6;font-size:11px">(주 10만원)</span></td><td style="text-align:right;font-family:var(--mono)">약 433,000</td></tr>
+    <tr style="border-top:2px solid var(--border)"><td><strong>합계</strong></td><td style="text-align:right;font-family:var(--mono)"><b>약 2,083,000</b></td></tr>
+  </tbody></table></div>
   <div class="divider"></div>
   <p class="sec">종목별 펀더멘털 훼손 체크리스트 <span class="tag">가격 손절선 대체 · 2026-08-26 (전 6종목)</span></p>
   <div style="opacity:.8;margin-bottom:10px;font-size:12px">점검 시점: 분기 실적 발표 시 + 아래 이벤트 인지 시. <b>가격 하락 자체는 매도 사유가 아님</b> — 보유 논리의 훼손 여부만 점검. 각 종목 <b>2개 이상 해당 시</b> 보유 논리 재검토(claude.ai 상담 → 핸드오프 → 반영). 항목은 재검토 때마다 수정 가능.</div>
@@ -1149,8 +1175,9 @@ const bufYMD=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+S
 const bufAccts=()=>(S.cash||[]).filter(c=>c.buf);
 const bufTotal=()=>bufAccts().reduce((a,c)=>a+(+c.bal||0),0);
 const bufPrin=()=>bufAccts().reduce((a,c)=>a+(+c.prin||0),0);
-// 버퍼 15% 산정의 분모. 연금계좌(tax:true — IRP·연금저축)는 중도인출 제약으로
-// 위기 시 동원할 수 없으므로 2026-08-28 결정에 따라 순자산에서 제외한다.
+// 버퍼 15% 산정의 분모 = 국내주식 + 코인 + 버퍼 계좌.
+// · 연금계좌(tax:true — IRP·연금저축)는 중도인출 제약으로 제외 (2026-08-28 결정)
+// · 코인은 즉시 현금화가 가능하므로 포함 (2026-08-30 B안 결정)
 // (대시보드 '총자산' 지표는 연금까지 포함하므로 두 값은 다를 수 있음)
 function bufNetWorth(){
   let t=0;S.stocks.forEach(s=>{if(s.cat!=='cash')t+=s.qty*s.cur;});
@@ -1280,6 +1307,7 @@ function renderBuf(){
   if(carryTot>0)h+='<div style="margin-top:6px;font-size:11px;color:var(--muted)">※ <b>이월</b> = 계획 배분액 × 실행일 경과 개월수('+bufMonthsDue()+') − 실제 기록액. 미집행분이 다른 계좌(예: CMA)에 대기 중일 수 있습니다. 금은 정량 매수라 이월을 계산하지 않습니다.</div>';
 
   const pen=bufPension();
+  const coin=S.stocks.filter(s=>s.cat==='coin').reduce((a,s)=>a+s.qty*s.cur,0);
   h+='<div style="margin-top:14px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">전체 순자산'+(pen?'(연금 제외)':'')+' ₩'+W(Math.round(nw))+' 대비 <b style="color:var(--fg)">'+pct.toFixed(1)+'%</b> / 목표 '+BUF_CFG.target+'%'
     +(rem>0?' · 남은 금액 ₩'+W(Math.round(rem))+' (월 '+W(BUF_MONTHLY)+'원 기준 약 '+months+'개월)':' · <b style="color:var(--green)">목표 도달</b>')+'</div>'
     +'<div style="background:var(--bg3);border-radius:6px;height:14px;overflow:hidden"><div style="height:100%;width:'+gpct+'%;background:'+(rem>0?'var(--accent)':'var(--green)')+';transition:width .3s"></div></div></div>';
@@ -1298,6 +1326,7 @@ function renderBuf(){
       +'<td style="text-align:center"><button class="btn btn-sm" style="color:var(--red);border-color:var(--red);font-size:11px" onclick="delBufLog('+i+')">삭제</button></td></tr>').join('')
     :'<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:14px">아직 적립 기록이 없습니다.</td></tr>';
   h+='</tbody></table></div>';
+  if(coin)h+='<div style="margin-top:6px;font-size:11px;color:var(--muted)">※ 코인 ₩'+W(Math.round(coin))+'은 즉시 현금화가 가능하므로 <b>분모에 포함</b>됩니다(2026-08-30 B안 결정). 제외 시 비중은 '+(bt/(nw-coin)*100).toFixed(2)+'%입니다. 단 <b>계획 탭 목표비중 계산에서는 제외</b>됩니다.</div>';
   if(pen)h+='<div style="margin-top:6px;font-size:11px;color:var(--muted)">※ 연금계좌(IRP·연금저축) ₩'+W(Math.round(pen))+'는 <b>중도인출 제약으로 버퍼 산정 분모에서 제외</b>됩니다(2026-08-28 결정). 포함 시 비중은 '+(bt/(nw+pen)*100).toFixed(2)+'%로 낮아집니다.</div>';
   h+='<div style="margin-top:8px;font-size:11px;color:var(--muted)">※ 버퍼는 <b>계획 탭 목표비중의 현금(10%)과 별개</b>입니다 — 주식계좌 내 예수금이 아니므로 비중 계산에서 제외됩니다. 금은 시세에 따라 평가액이 변하므로 누적원금과 잔액이 달라집니다.</div>';
   el.innerHTML=h;
@@ -1790,7 +1819,9 @@ function renderPlan(){
   const el=document.getElementById('plan-tb'); if(!el)return;
   const TG=[['삼성전자',30],['SK하이닉스',17],['KODEX200',17],['현대글로비스',9],['HD현대중공업',9],['현대차',8],['현금',10]];
   const cashDep=(S.cash||[]).filter(c=>!c.tax&&!c.buf).reduce((a,c)=>a+(+c.bal||0),0); // buf=유동성 버퍼는 외부 트랙이라 제외
-  const tot=(S.stocks.reduce((a,s)=>a+s.qty*s.cur,0)+cashDep)||1;
+  // 목표비중은 국내주식 포트폴리오 한정. 코인(v11 참고 트랙, 관리규칙 없음)을 분모에 넣으면
+  // 6종목 비중이 전부 희석되므로 제외한다. 단 버퍼 15% 분모에는 포함(2026-08-30 B안 결정).
+  const tot=(S.stocks.filter(s=>s.cat!=='coin').reduce((a,s)=>a+s.qty*s.cur,0)+cashDep)||1;
   let html='';
   TG.forEach(([nm,tw])=>{
     const s=S.stocks.find(x=>canonName(x.name)===canonName(nm));
